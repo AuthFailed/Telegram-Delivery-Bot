@@ -8,32 +8,37 @@ async def change_order_status(order_id: int):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Заявка принята",
+                    text="✅ Заявка принята",
                     callback_data=order_status.new(order_id=order_id,
                                                    status="Заявка принята")
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="Курьер забрал заказ",
+                    text="📤 Курьер забрал заказ",
                     callback_data=order_status.new(order_id=order_id,
                                                    status="Курьер забрал заказ")
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="Курьер отдал заказ",
+                    text="📥 Курьер отдал заказ",
                     callback_data=order_status.new(order_id=order_id,
                                                    status="Курьер отдал заказ")
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="Отмена заявки",
+                    text="✖️ Отмена заявки",
                     callback_data=order_status.new(order_id=order_id,
                                                    status="Отмена заявки")
+                ),
+                InlineKeyboardButton(
+                    text="🏠 Вернуться",
+                    callback_data=order_status.new(order_id=order_id,
+                                                   status="Вернуться")
                 )
-            ]
+            ],
         ]
     )
     return change_status_kb

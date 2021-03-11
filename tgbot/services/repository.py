@@ -25,6 +25,12 @@ class Repo:
         )
         return result
 
+    async def change_user_column(self, user_id: int, column: str, data: str):
+        """Change user data in certain column"""
+        await self.conn.execute(
+            "UPDATE customers SET {0} = \'{1}\' WHERE userid = {2}".format(column, data, user_id)
+        )
+
     async def get_user_orders(self, user_id: int):
         rows = await self.conn.fetch(
             "SELECT * FROM orders WHERE customerid = $1",
@@ -55,6 +61,28 @@ class Repo:
             user_id
         )
 
+    # couriers
+    async def add_courier(self, user_id: int, name: str, number: str, passport_main_id: str,
+                          passport_registration_id: str, driver_license_front_id: str, driver_license_back_id: str):
+        """Add courier to DB"""
+        await self.conn.execute(
+            "INSERT INTO couriers(UserId, Name, Number, PassportMain, PassportRegistration, DriverLicenseFront, DriverLicenseBack) "
+            "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\')".format(user_id,
+                                                                                        name,
+                                                                                        number,
+                                                                                        passport_main_id,
+                                                                                        passport_registration_id,
+                                                                                        driver_license_front_id,
+                                                                                        driver_license_back_id)
+        )
+
+    async def get_couriers_list(self):
+        """Get couriers list"""
+        rows = await self.conn.fetch(
+            "SELECT userid FROM couriers"
+        )
+        return [dict(row) for row in rows]
+
     # orders
     async def add_order(self,
                         customer_id: int,
@@ -79,6 +107,7 @@ class Repo:
         return order_id
 
     async def get_order(self, order_id: int):
+        """Get order info by order_id"""
         result = self.conn.fetchrow(
             "SELECT * FROM orders WHERE orderid = $1",
             order_id
@@ -86,12 +115,14 @@ class Repo:
         return result
 
     async def change_order_status(self, order_id: int, order_status: str):
+        """Change order status by order_id"""
         await self.conn.execute(
             f"UPDATE orders SET status = \'{order_status}\' WHERE orderid = {order_id}"
         )
 
     # stats
     async def get_orders_count(self, date_range: str):
+        """Get orders count by date range"""
         result = self.conn.fetchval(
             """select date_trunc('$1', orders.CurrentTime), count(1) from orders group by 1;""",
             date_range

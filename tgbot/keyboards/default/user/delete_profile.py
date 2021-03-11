@@ -1,19 +1,14 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-who_are_you = ReplyKeyboardMarkup(
+delete_profile_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
     keyboard=[
         [
             KeyboardButton(
-                text="👥 Компания"
+                text="✅ Да, я уверен(а)"
             ),
             KeyboardButton(
-                text="👨‍💻 Частное лицо"
-            )
-        ],
-        [
-            KeyboardButton(
-                text="🚚 Стать курьером"
+                text="✖️ Нет, я передумал(а)"
             )
         ],
         [

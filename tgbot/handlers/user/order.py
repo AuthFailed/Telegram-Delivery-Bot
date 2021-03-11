@@ -17,9 +17,9 @@ async def order_starts(m: Message, repo: Repo):
     if is_user_exists:
         customer_data = await repo.get_user(user_id=m.chat.id)
         if customer_data['usertype'] == "Частное лицо":
-            answer_message = "Введите:\nФИО\nНомер телефона\nАдрес получателя:"
+            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя:"
         else:
-            answer_message = "Введите:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя\nДату и время доставки:"
         await m.reply(text=answer_message,
                       reply_markup=return_to_menu)
         await Order.first()
@@ -47,7 +47,7 @@ async def order_all_info(m: Message, repo: Repo, state: FSMContext):
             )
             await Order.order_datetime.set()
         else:
-            await m.answer(text="❌ Введите текст в указаном формате.")
+            await m.answer(text="✖️ Введите текст в указаном формате.")
     else:
         if len(spliced_info) == 4:
             order_name = spliced_info[0]
@@ -68,7 +68,7 @@ async def order_all_info(m: Message, repo: Repo, state: FSMContext):
             )
             await Order.other_details.set()
         else:
-            await m.answer(text="❌ Введите текст в указаном формате.")
+            await m.answer(text="✖️ Введите текст в указаном формате.")
 
 
 async def order_datetime(m: Message, state: FSMContext):
@@ -212,9 +212,9 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         customer_type = customer['usertype']
 
         if customer_type == "Частное лицо":
-            answer_message = "Введите:\nФИО\nНомер телефона\nАдрес получателя:"
+            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя:"
         else:
-            answer_message = "Введите:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя\nДату и время доставки:"
         await m.answer(
             text=answer_message,
             reply_markup=return_to_menu,

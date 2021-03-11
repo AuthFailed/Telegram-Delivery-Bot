@@ -1,10 +1,11 @@
+import asyncpg
 from aiogram.dispatcher.middlewares import LifetimeControllerMiddleware
 
 from tgbot.services.repository import Repo
 
 
 class DbMiddleware(LifetimeControllerMiddleware):
-    def __init__(self, pool):
+    def __init__(self, pool: asyncpg.Pool):
         super().__init__()
         self.pool = pool
 

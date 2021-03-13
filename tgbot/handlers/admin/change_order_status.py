@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery
 
-from tgbot.keyboards.inline.admin.order import order_keyboard
+from tgbot.keyboards.inline.manager.order import order_keyboard
 from tgbot.services.repository import Repo
 
 
@@ -11,7 +11,7 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
     if order_status == "Вернуться":
         order_data_coroutine = await repo.get_order(order_id=order_id)
         order_data = await order_data_coroutine
-        order_text = f"""🚩 Новая заявка №{order_id} | *Компания*
+        order_text = f"""🚩 Новый заказ №{order_id} | *Компания*
 ⏳ Статус: _{order_data['status']}_
 
 📤 Отправитель:
@@ -35,7 +35,7 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
         order_data_coroutine = await repo.get_order(order_id=order_id)
         order_data = await order_data_coroutine
 
-        order_text = f"""🚩 Новая заявка №{order_id} | *Компания*
+        order_text = f"""🚩 Новый заказ №{order_id} | *Компания*
 ⏳ Статус: _{order_data['status']}_
     
 📤 Отправитель:
@@ -56,6 +56,6 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
                                      parse_mode="MARKDOWN")
 
         await call.bot.send_message(chat_id=order_data['customerid'],
-                                    text=f"🚩 Статус заявки №{order_id} обновлен!\n"
+                                    text=f"🚩 Статус заказа №{order_id} обновлен!\n"
                                          f"⏳ Статус: _{order_data['status']}_",
                                     parse_mode="MARKDOWN")

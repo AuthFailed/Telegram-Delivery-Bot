@@ -6,7 +6,7 @@ from tgbot.keyboards.default.user.check_order import check_order
 from tgbot.keyboards.default.user.choose_time import choose_time
 from tgbot.keyboards.default.user.main_menu import main_menu
 from tgbot.keyboards.default.user.return_to_menu import return_to_menu
-from tgbot.keyboards.inline.admin.order import order_keyboard
+from tgbot.keyboards.inline.manager.order import order_keyboard
 from tgbot.services.repository import Repo
 from tgbot.states.user.order import Order
 
@@ -17,9 +17,9 @@ async def order_starts(m: Message, repo: Repo):
     if is_user_exists:
         customer_data = await repo.get_user(user_id=m.chat.id)
         if customer_data['usertype'] == "Частное лицо":
-            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя:"
+            answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
         else:
-            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
         await m.reply(text=answer_message,
                       reply_markup=return_to_menu)
         await Order.first()
@@ -77,8 +77,8 @@ async def order_datetime(m: Message, state: FSMContext):
     await state.update_data(order_datetime=time)
     await m.answer(
         text=f"""Напишите подробное описание что нужно купить или что нужно забрать курьеру
-    Например: 1 литр молока Простоквашино, хлеб 1 буханка круглый и так далее,
-    так же указать магазин в котором нужно купить (магнит,пятёрочка и т.д)""",
+Например: 1 литр молока Простоквашино, хлеб 1 буханка круглый и так далее,
+так же указать магазин в котором нужно купить (магнит,пятёрочка и т.д)""",
         reply_markup=return_to_menu)
     await Order.other_details.set()
 
@@ -92,18 +92,18 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
 
     if order_data['user_type'] == "Частное лицо":
         message_to_send = (
-            f"""🚩 Ваша заявка
+            f"""🚩 Ваш заказ
 ⏳ Статус: _Редактирование_
 
 📤 Отправитель:
 ФИО: `{customer_data['name']}`
 Адрес: `{customer_data['address']}`
-Номер телефона: `{customer_data['number']}`
+Номер телефона: {customer_data['number']}
 
 📥 Получатель:
 ФИО: `{order_data['order_name']}`
 Адрес: `{order_data['order_address']}`
-Номер телефона: `{order_data['order_number']}`
+Номер телефона: {order_data['order_number']}
 
 📦 О заказе:
 Время доставки: `{order_data['order_datetime']}`
@@ -111,18 +111,18 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
         )
     else:
         message_to_send = (
-            f"""🚩 Ваша заявка!
+            f"""🚩 Ваш заказ!
 ⏳ Статус: _Редактирование_
 
 📤 Отправитель:
 Название: `{customer_data['name']}`
 Адрес: `{customer_data['address']}`
-Номер телефона: `{customer_data['number']}`
+Номер телефона: {customer_data['number']}
 
 📥 Получатель:
 ФИО: `{order_data['order_name']}`
 Адрес: `{order_data['order_address']}`
-Номер: `{order_data['order_number']}`
+Номер телефона: {order_data['order_number']}
 
 📦 О заказе:
 Дата и время доставки: `{order_data['order_datetime']}`
@@ -154,18 +154,18 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
 
         if customer_data["usertype"] == "Частное лицо":
             message_to_send = (
-                f"""🚩 Новая заявка №{order_id} | *Частное лицо*
+                f"""🚩 Новый заказ №{order_id} | *Частное лицо*
 ⏳ Статус: _Обрабатывается_
 
 📤 Отправитель:
 ФИО: `{customer_data['name']}`
 Адрес: `{customer_data['address']}`
-Номер телефона: `{customer_data['number']}`
+Номер телефона: {customer_data['number']}
 
 📥 Получатель:
 ФИО: `{order_data['order_name']}`
 Адрес: `{order_data['order_address']}`
-Номер телефона: `{order_data['order_number']}`
+Номер телефона: {order_data['order_number']}
 
 📦 О заказе:
 Время доставки: `{order_data['order_datetime']}`
@@ -173,18 +173,18 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
             )
         else:
             message_to_send = (
-                f"""🚩 Новая заявка №{order_id} | *Компания*
+                f"""🚩 Новый заказ №{order_id} | *Компания*
 ⏳ Статус: _Обрабатывается_
 
 📤 Отправитель:
 Название: `{customer_data['name']}`
 Адрес: `{customer_data['address']}`
-Номер телефона: `{customer_data['number']}`
+Номер телефона: {customer_data['number']}
 
 📥 Получатель:
 ФИО: `{order_data['order_name']}`
-Номер: `{order_data['order_number']}`
 Адрес: `{order_data['order_address']}`
+Номер телефона: {order_data['order_number']}
 
 📦 О заказе:
 Дата и время доставки: `{order_data['order_datetime']}`
@@ -198,7 +198,7 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
                                  parse_mode="MARKDOWN")
 
         await m.answer(
-            text=f"🚩 Заявка №{order_id} отправлена!\n"
+            text=f"🚩 Заказ №{order_id} отправлен!\n"
                  f"⏳ Статус: _Обрабатывается_",
             reply_markup=ReplyKeyboardRemove(),
             parse_mode="MARKDOWN"
@@ -212,9 +212,9 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         customer_type = customer['usertype']
 
         if customer_type == "Частное лицо":
-            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя:"
+            answer_message = "Введите данные в следующем формате:\nФИО\n☎️ Номер телефона\nАдрес получателя:"
         else:
-            answer_message = "Введите:\nФИО\n☎️ Номер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите данные в следующем формате:\nФИО\n☎️ Номер телефона\nАдрес получателя\nДату и время доставки:"
         await m.answer(
             text=answer_message,
             reply_markup=return_to_menu,

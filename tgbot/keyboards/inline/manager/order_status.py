@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.keyboards.inline.admin.callback_data import order_status
+from tgbot.keyboards.inline.manager.callback_data import order_status
 
 
 async def change_order_status(order_id: int):
@@ -8,9 +8,9 @@ async def change_order_status(order_id: int):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✅ Заявка принята",
+                    text="✅ Заказ принят",
                     callback_data=order_status.new(order_id=order_id,
-                                                   status="Заявка принята")
+                                                   status="Заказ принят")
                 ),
             ],
             [
@@ -29,9 +29,9 @@ async def change_order_status(order_id: int):
             ],
             [
                 InlineKeyboardButton(
-                    text="✖️ Отмена заявки",
+                    text="✖️ Отмена заказа",
                     callback_data=order_status.new(order_id=order_id,
-                                                   status="Отмена заявки")
+                                                   status="Отмена заказа")
                 ),
                 InlineKeyboardButton(
                     text="🏠 Вернуться",

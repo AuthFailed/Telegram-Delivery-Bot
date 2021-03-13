@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tgbot.keyboards.inline.admin.callback_data import order
+from tgbot.keyboards.inline.manager.callback_data import order
 
 
 async def order_keyboard(order_id: int):

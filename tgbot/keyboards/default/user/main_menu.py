@@ -8,7 +8,7 @@ async def main_menu(reg: bool):
                                            keyboard=[
                                                [
                                                    KeyboardButton(
-                                                       text="🚩 Создать заявку"
+                                                       text="🚩 Создать заказ"
                                                    ),
                                                    KeyboardButton(
                                                        text="👨‍💻 Личный кабинет"

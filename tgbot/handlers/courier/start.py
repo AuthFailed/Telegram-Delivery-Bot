@@ -8,5 +8,5 @@ async def courier_start(m: Message, state: FSMContext = None):
     if state is not None:
         await state.finish()
 
-    await m.answer(text="Главное меню курьера",
+    await m.answer(text="Главное меню",
                    reply_markup=main_menu)

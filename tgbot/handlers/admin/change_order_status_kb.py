@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery
 
-from tgbot.keyboards.inline.admin.order_status import change_order_status
+from tgbot.keyboards.inline.manager.order_status import change_order_status
 
 
 async def change_order_status_kb(call: CallbackQuery, callback_data: dict):

@@ -28,20 +28,8 @@ def register_user(dp: Dispatcher):
     dp.register_message_handler(reg_user_address, content_types=['text'], state=RegistrationUser.address)
     dp.register_message_handler(reg_user_number, content_types=['text'], state=RegistrationUser.number)
 
-    # reg courier
-    dp.register_message_handler(reg_courier_name, content_types=['text'], state=RegistrationCourier.name)
-    dp.register_message_handler(reg_courier_number, content_types=['text'], state=RegistrationCourier.number)
-    dp.register_message_handler(reg_courier_passport_main, content_types=['photo'],
-                                state=RegistrationCourier.passport_main)
-    dp.register_message_handler(reg_courier_passport_registration, content_types=['photo'],
-                                state=RegistrationCourier.passport_registration)
-    dp.register_message_handler(reg_courier_driving_license_front, content_types=['photo'],
-                                state=RegistrationCourier.driving_license_front)
-    dp.register_message_handler(reg_courier_driving_license_back, content_types=['photo'],
-                                state=RegistrationCourier.driving_license_back)
-
     # new order
-    dp.register_message_handler(order_starts, text="🚩 Создать заявку", role=UserRole.USER)
+    dp.register_message_handler(order_starts, text="🚩 Создать заказ", role=UserRole.USER)
     dp.register_message_handler(order_all_info, state=Order.all_info, role=UserRole.USER)
     dp.register_message_handler(order_datetime, state=Order.order_datetime, role=UserRole.USER)
     dp.register_message_handler(order_other_details, state=Order.other_details, role=UserRole.USER)

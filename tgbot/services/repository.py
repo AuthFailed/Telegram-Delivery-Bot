@@ -65,16 +65,33 @@ class Repo:
     async def add_courier(self, user_id: int, name: str, number: str, passport_main_id: str,
                           passport_registration_id: str, driver_license_front_id: str, driver_license_back_id: str):
         """Add courier to DB"""
-        await self.conn.execute(
+        courier_data = await self.conn.fetch(
             "INSERT INTO couriers(UserId, Name, Number, PassportMain, PassportRegistration, DriverLicenseFront, DriverLicenseBack) "
-            "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\')".format(user_id,
-                                                                                        name,
-                                                                                        number,
-                                                                                        passport_main_id,
-                                                                                        passport_registration_id,
-                                                                                        driver_license_front_id,
-                                                                                        driver_license_back_id)
+            "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\') "
+            "RETURNING id, PassportMain, PassportRegistration, DriverLicenseFront, DriverLicenseBack".format(user_id,
+                                                                                                             name,
+                                                                                                             number,
+                                                                                                             passport_main_id,
+                                                                                                             passport_registration_id,
+                                                                                                             driver_license_front_id,
+                                                                                                             driver_license_back_id)
         )
+        return courier_data
+
+    async def get_courier(self, courier_id: int):
+        """Get full user data from DB"""
+        result = await self.conn.fetchrow(
+            "SELECT * FROM couriers WHERE UserId = {0}".format(courier_id)
+        )
+        return result
+
+    async def get_couriers_orders(self, courier_id: int):
+        """Get all orders completed by courier"""
+        rows = await self.conn.fetch(
+            "SELECT * FROM orders WHERE Сourierid = $1",
+            courier_id
+        )
+        return [dict(row) for row in rows]
 
     async def get_couriers_list(self):
         """Get couriers list"""
@@ -82,6 +99,17 @@ class Repo:
             "SELECT userid FROM couriers"
         )
         return [dict(row) for row in rows]
+
+    async def change_courier_apply_status(self, courier_id: int, applied: bool):
+        await self.conn.execute(
+            "UPDATE couriers SET applied = {0} WHERE userid = {1}".format(applied, courier_id)
+        )
+
+    async def change_courier_status(self, courier_id: int, status: str):
+        """Change courier status"""
+        await self.conn.execute(
+            "UPDATE couriers SET status = \'{0}\' WHERE userid = {1}".format(status, courier_id)
+        )
 
     # orders
     async def add_order(self,
@@ -108,7 +136,7 @@ class Repo:
 
     async def get_order(self, order_id: int):
         """Get order info by order_id"""
-        result = self.conn.fetchrow(
+        result = await self.conn.fetchrow(
             "SELECT * FROM orders WHERE orderid = $1",
             order_id
         )
@@ -123,7 +151,7 @@ class Repo:
     # stats
     async def get_orders_count(self, date_range: str):
         """Get orders count by date range"""
-        result = self.conn.fetchval(
+        result = await self.conn.fetchval(
             """select date_trunc('$1', orders.CurrentTime), count(1) from orders group by 1;""",
             date_range
         )

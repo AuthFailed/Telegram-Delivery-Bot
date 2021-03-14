@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 async def change_user_info(user_type: str):
     if user_type == "Компания":
-        change_user_info_kb = ReplyKeyboardMarkup(
+        keyboard = ReplyKeyboardMarkup(
             resize_keyboard=True,
             keyboard=[
                 [
@@ -30,7 +30,7 @@ async def change_user_info(user_type: str):
             ]
         )
     else:
-        change_user_info_kb = ReplyKeyboardMarkup(
+        keyboard = ReplyKeyboardMarkup(
             resize_keyboard=True,
             keyboard=[
                 [
@@ -56,4 +56,4 @@ async def change_user_info(user_type: str):
                 ]
             ]
         )
-    return change_user_info_kb
+    return keyboard

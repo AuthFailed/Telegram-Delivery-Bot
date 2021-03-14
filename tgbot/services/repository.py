@@ -10,12 +10,15 @@ class Repo:
     # users
     async def add_user(self, user_id: int, user_type: str, name: str, address: str, number: str) -> None:
         """Store user in DB, ignore duplicates"""
-        await self.conn.execute(
+        result = await self.conn.fetchval(
             "INSERT INTO customers (UserId, UserType, Name, Address, Number)" \
-            " VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\') ON CONFLICT DO NOTHING".format(user_id, user_type, name,
-                                                                                              address, number),
+            " VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\') ON CONFLICT DO NOTHING RETURNING id".format(user_id,
+                                                                                                           user_type,
+                                                                                                           name,
+                                                                                                           address,
+                                                                                                           number),
         )
-        return
+        return result
 
     async def get_user(self, user_id: int):
         """Get full user data from DB"""
@@ -33,7 +36,7 @@ class Repo:
 
     async def get_user_orders(self, user_id: int):
         rows = await self.conn.fetch(
-            "SELECT * FROM orders WHERE customerid = $1",
+            "SELECT * FROM orders WHERE customerid = $1 ORDER BY orderid DESC",
             user_id
         )
         return [dict(row) for row in rows]
@@ -68,27 +71,35 @@ class Repo:
         courier_data = await self.conn.fetch(
             "INSERT INTO couriers(UserId, Name, Number, PassportMain, PassportRegistration, DriverLicenseFront, DriverLicenseBack) "
             "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\') "
-            "RETURNING id, PassportMain, PassportRegistration, DriverLicenseFront, DriverLicenseBack".format(user_id,
-                                                                                                             name,
-                                                                                                             number,
-                                                                                                             passport_main_id,
-                                                                                                             passport_registration_id,
-                                                                                                             driver_license_front_id,
-                                                                                                             driver_license_back_id)
+            "RETURNING id, name, number, PassportMain, PassportRegistration, DriverLicenseFront, DriverLicenseBack".format(
+                user_id,
+                name,
+                number,
+                passport_main_id,
+                passport_registration_id,
+                driver_license_front_id,
+                driver_license_back_id)
         )
         return courier_data
 
-    async def get_courier(self, courier_id: int):
+    async def get_courier_by_userid(self, courier_id: int):
         """Get full user data from DB"""
         result = await self.conn.fetchrow(
-            "SELECT * FROM couriers WHERE UserId = {0}".format(courier_id)
+            "SELECT * FROM couriers WHERE userid = {0}".format(courier_id)
+        )
+        return result
+
+    async def get_courier_by_id(self, courier_id: int):
+        """Get full user data from DB"""
+        result = await self.conn.fetchrow(
+            "SELECT * FROM couriers WHERE id = {0}".format(courier_id)
         )
         return result
 
     async def get_couriers_orders(self, courier_id: int):
         """Get all orders completed by courier"""
         rows = await self.conn.fetch(
-            "SELECT * FROM orders WHERE Сourierid = $1",
+            "SELECT * FROM orders WHERE courierid = $1",
             courier_id
         )
         return [dict(row) for row in rows]
@@ -97,6 +108,13 @@ class Repo:
         """Get couriers list"""
         rows = await self.conn.fetch(
             "SELECT userid FROM couriers"
+        )
+        return [dict(row) for row in rows]
+
+    async def get_available_couriers_list(self):
+        """Get available couriers from DB"""
+        rows = await self.conn.fetch(
+            "SELECT * from couriers WHERE status = \'Свободен\'"
         )
         return [dict(row) for row in rows]
 
@@ -137,15 +155,19 @@ class Repo:
     async def get_order(self, order_id: int):
         """Get order info by order_id"""
         result = await self.conn.fetchrow(
-            "SELECT * FROM orders WHERE orderid = $1",
-            order_id
+            "SELECT * FROM orders WHERE orderid = {0}".format(order_id)
         )
         return result
 
     async def change_order_status(self, order_id: int, order_status: str):
         """Change order status by order_id"""
         await self.conn.execute(
-            f"UPDATE orders SET status = \'{order_status}\' WHERE orderid = {order_id}"
+            "UPDATE orders SET status = \'{0}\' WHERE orderid = {1}".format(order_status, order_id)
+        )
+
+    async def change_order_courier(self, order_id: int, courier_id: int):
+        await self.conn.execute(
+            "UPDATE orders SET Courierid = {0} WHERE orderid = {1}".format(courier_id, order_id)
         )
 
     # stats

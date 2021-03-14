@@ -4,7 +4,7 @@ from aiogram.types import Message
 from tgbot.keyboards.default.admin.main_menu import main_menu
 
 
-async def admin_start(m: Message, state: FSMContext = None):
+async def manager_start(m: Message, state: FSMContext = None):
     if state is not None:
         await state.finish()
 

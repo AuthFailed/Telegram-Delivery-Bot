@@ -20,7 +20,7 @@ async def user_start(m: Message, repo: Repo, state: FSMContext = None):
 Работаем для компаний и частных лиц!
 У нас есть Карта цен и круглосуточная служба поддержки!
 Регистрируйся и создавай заказ уже сегодня!""",
-                       parse_mode="MARKDOWN")
+                       parse_mode="Markdown")
         await m.answer(
             text=f"Главное меню",
             reply_markup=await main_menu(reg=False)

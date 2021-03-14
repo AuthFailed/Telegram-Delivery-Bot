@@ -6,6 +6,7 @@ from tgbot.config import load_config
 from tgbot.keyboards.default.courier.main_menu import main_menu
 from tgbot.keyboards.default.user.return_to_menu import return_to_menu
 from tgbot.keyboards.inline.manager.accept_courier import courier_request_kb
+from tgbot.services.event_handlers import new_courier
 from tgbot.services.repository import Repo
 from tgbot.states.user.registration import RegistrationCourier
 
@@ -75,17 +76,18 @@ async def reg_courier_driving_license_back(m: Message, repo: Repo, state: FSMCon
     media.attach_photo(courier_db_data[0]['driverlicensefront'])
     media.attach_photo(courier_db_data[0]['driverlicenseback'])
 
-    courier_data_message = await m.bot.send_message(chat_id=config.tg_bot.couriers_group,
-                                                    text=f"""*🚚 Курьер №{courier_db_data[0]['id']} зарегистрирован*
+    courier_message = f"""*🚚 Курьер №{courier_db_data[0]['id']} зарегистрирован*
 
 👨 Данные:
 ФИО: `{courier_data['name']}`
 Номер: {courier_data['number']}
 
 ⏳ Статус заявки:
-_На рассмотрении_""",
+_На рассмотрении_"""
+    courier_data_message = await m.bot.send_message(chat_id=config.tg_bot.couriers_group,
+                                                    text=courier_message,
                                                     reply_markup=await courier_request_kb(courier_id=m.chat.id),
                                                     parse_mode="Markdown")
-
+    await new_courier(m=m, courier_data=courier_db_data[0])
     await courier_data_message.answer_media_group(media=media,
                                                   reply=True)

@@ -4,7 +4,7 @@ from tgbot.keyboards.inline.manager.callback_data import order_status
 
 
 async def change_order_status(order_id: int):
-    change_status_kb = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
@@ -41,4 +41,4 @@ async def change_order_status(order_id: int):
             ],
         ]
     )
-    return change_status_kb
+    return keyboard

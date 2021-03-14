@@ -10,5 +10,5 @@ Telegram: @MegaBot\_flowers
 WhatsApp: \+79881739293 \([Перейти](https://wa.me/79881739293)\)
 Телефон: 43\-92\-93""",
                   reply_markup=return_to_menu,
-                  parse_mode="MARKDOWNV2",
+                  parse_mode="MarkdownV2",
                   disable_web_page_preview=True)

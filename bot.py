@@ -8,9 +8,10 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage
 
 from tgbot.config import load_config
 from tgbot.filters.role import RoleFilter, AdminFilter
-from tgbot.handlers.admin import register_admin
 from tgbot.handlers.courier import register_courier
-from tgbot.handlers.user import register_user
+from tgbot.handlers.customer import register_customer
+from tgbot.handlers.groups import register_group
+from tgbot.handlers.manager import register_manager
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
 
@@ -48,9 +49,13 @@ async def main():
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
 
-    register_admin(dp)
+    # register_admin(dp)
+    register_manager(dp)
     register_courier(dp)
-    register_user(dp)
+    register_group(dp)
+    register_customer(dp)
+
+    # register apscheduler
 
     # start
     try:

@@ -4,6 +4,7 @@ from aiogram.types import Message
 from tgbot.keyboards.default.user.main_menu import main_menu as user_main_menu
 from tgbot.keyboards.default.user.return_to_menu import return_to_menu
 from tgbot.keyboards.default.user.who_are_you import who_are_you
+from tgbot.services.event_handlers import new_customer
 from tgbot.services.repository import Repo
 from tgbot.states.user.registration import RegistrationUser, RegistrationCourier
 
@@ -90,11 +91,12 @@ async def reg_user_number(m: Message, repo: Repo, state: FSMContext):
         async with state.proxy() as data:
             data['number'] = m.text
 
-        await repo.add_user(user_id=m.chat.id,
-                            user_type=data['user_type'],
-                            name=data['name'],
-                            address=data['address'],
-                            number=data['number'])
+        customer_id = await repo.add_user(user_id=m.chat.id,
+                                          user_type=data['user_type'],
+                                          name=data['name'],
+                                          address=data['address'],
+                                          number=data['number'])
         await state.finish()
+        await new_customer(m=m, customer_data=data, customer_id=customer_id)
         await m.answer(text="👋 Вы зарегистрировались.\nТеперь вы можете оставить заказ!")
         await m.answer(text="Главное меню", reply_markup=await user_main_menu(reg=True))

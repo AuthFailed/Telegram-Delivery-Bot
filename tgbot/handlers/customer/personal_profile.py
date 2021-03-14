@@ -13,7 +13,7 @@ async def personal_profile(m: Message, repo: Repo):
 
 👨 *Общая информация*:
 Тип аккаунта: `{user_data['usertype']}`
-Имя: `{user_data['name']}`
+Лицо: `{user_data['name']}`
 Адрес: `{user_data['address']}`
 Номер: `{user_data['number']}`
 
@@ -22,4 +22,4 @@ async def personal_profile(m: Message, repo: Repo):
 
     await m.reply(text=answer_message,
                   reply_markup=personal_profile_kb,
-                  parse_mode='MARKDOWNV2')
+                  parse_mode='MarkdownV2')

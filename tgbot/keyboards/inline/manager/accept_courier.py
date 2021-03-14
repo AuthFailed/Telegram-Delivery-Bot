@@ -4,7 +4,7 @@ from tgbot.keyboards.inline.manager.callback_data import new_courier
 
 
 async def courier_request_kb(courier_id: int):
-    courier_request = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
@@ -20,4 +20,4 @@ async def courier_request_kb(courier_id: int):
             ]
         ]
     )
-    return courier_request
+    return keyboard

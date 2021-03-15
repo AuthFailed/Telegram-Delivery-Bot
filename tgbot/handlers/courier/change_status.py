@@ -4,13 +4,13 @@ from aiogram.types import Message
 from tgbot.handlers.courier.personal_profile import personal_profile
 from tgbot.keyboards.default.courier.change_status import change_status_kb
 from tgbot.services.repository import Repo
-from tgbot.states.courier.change_status import ChangeCourierStatus
+from tgbot.states.courier.change_status import ChangeStatus
 
 
 async def ask_for_status(m: Message):
     await m.reply(text="Выберите статус из списка ниже:",
                   reply_markup=change_status_kb)
-    await ChangeCourierStatus.first()
+    await ChangeStatus.first()
 
 
 async def set_new_status(m: Message, repo: Repo, state: FSMContext):

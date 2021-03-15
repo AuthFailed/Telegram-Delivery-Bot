@@ -17,7 +17,7 @@ async def reg_starts(m: Message):
 
 
 # user
-async def reg_user_type(m: Message, repo: Repo, state: FSMContext):
+async def reg_type(m: Message, repo: Repo, state: FSMContext):
     if m.text == "👥 Компания":
         await state.update_data(user_type="Компания")
         await m.reply(text="Введите *название вашей компании*:", reply_markup=return_to_menu,
@@ -39,7 +39,7 @@ async def reg_user_type(m: Message, repo: Repo, state: FSMContext):
         await state.finish()
 
 
-async def reg_user_name(m: Message, repo: Repo, state: FSMContext):
+async def reg_name(m: Message, repo: Repo, state: FSMContext):
     if m.text == "Вернуться в меню":
         is_user_exists = await repo.is_user_exists(user_id=m.chat.id)
         await m.answer(text="Главное меню", reply_markup=await user_main_menu(reg=is_user_exists))
@@ -47,7 +47,7 @@ async def reg_user_name(m: Message, repo: Repo, state: FSMContext):
     else:
         async with state.proxy() as data:
             data['name'] = m.text
-            user_type = data['user_type']
+            user_type = data['type']
 
         if user_type == "Компания":
             await m.reply(text="📬 Введите *адрес компании*:",
@@ -61,7 +61,7 @@ async def reg_user_name(m: Message, repo: Repo, state: FSMContext):
         await RegistrationUser.next()
 
 
-async def reg_user_address(m: Message, repo: Repo, state: FSMContext):
+async def reg_address(m: Message, repo: Repo, state: FSMContext):
     if m.text == "Вернуться в меню":
         is_user_exists = await repo.is_user_exists(user_id=m.chat.id)
         await m.answer(text="Главное меню", reply_markup=await user_main_menu(reg=is_user_exists))
@@ -69,7 +69,7 @@ async def reg_user_address(m: Message, repo: Repo, state: FSMContext):
     else:
         async with state.proxy() as data:
             data['address'] = m.text
-            user_type = data['user_type']
+            user_type = data['type']
 
         if user_type == "Компания":
             await m.reply(text="☎️ Введите *телефон компании*:",
@@ -82,7 +82,7 @@ async def reg_user_address(m: Message, repo: Repo, state: FSMContext):
         await RegistrationUser.next()
 
 
-async def reg_user_number(m: Message, repo: Repo, state: FSMContext):
+async def reg_number(m: Message, repo: Repo, state: FSMContext):
     if m.text == "Вернуться в меню":
         is_user_exists = await repo.is_user_exists(user_id=m.chat.id)
         await m.answer(text="Главное меню", reply_markup=await user_main_menu(reg=is_user_exists))
@@ -92,7 +92,7 @@ async def reg_user_number(m: Message, repo: Repo, state: FSMContext):
             data['number'] = m.text
 
         customer_id = await repo.add_user(user_id=m.chat.id,
-                                          user_type=data['user_type'],
+                                          user_type=data['type'],
                                           name=data['name'],
                                           address=data['address'],
                                           number=data['number'])

@@ -114,19 +114,25 @@ class Repo:
     async def get_available_couriers_list(self):
         """Get available couriers from DB"""
         rows = await self.conn.fetch(
-            "SELECT * from couriers WHERE status = \'Свободен\'"
+            "SELECT * from couriers WHERE applied = True"
         )
         return [dict(row) for row in rows]
 
-    async def change_courier_apply_status(self, courier_id: int, applied: bool):
+    async def set_courier_apply_status(self, courier_id: int, applied: bool):
         await self.conn.execute(
             "UPDATE couriers SET applied = {0} WHERE userid = {1}".format(applied, courier_id)
         )
 
-    async def change_courier_status(self, courier_id: int, status: str):
+    async def set_courier_status(self, courier_id: int, status: str):
         """Change courier status"""
         await self.conn.execute(
             "UPDATE couriers SET status = \'{0}\' WHERE userid = {1}".format(status, courier_id)
+        )
+
+    async def delete_courier(self, courier_id: int):
+        """Delete courier from DB"""
+        await self.conn.execute(
+            "DELETE FROM couriers WHERE userid = {0}".format(courier_id)
         )
 
     # orders
@@ -171,10 +177,16 @@ class Repo:
         )
 
     # stats
-    async def get_orders_count(self, date_range: str):
+    async def get_orders_count(self, date_range: str, courier_id: int = None):
         """Get orders count by date range"""
-        result = await self.conn.fetchval(
-            """select date_trunc('$1', orders.CurrentTime), count(1) from orders group by 1;""",
-            date_range
-        )
+        if courier_id is None:
+            result = await self.conn.fetch(
+                """SELECT *, date_trunc('{0}', orders.CurrentTime), count(1) FROM orders GROUP BY 1 ;""".format(
+                    date_range)
+            )
+        else:
+            result = await self.conn.fetch(
+                "SELECT date_trunc('{0}', orders.CurrentTime), count(1) FROM orders WHERE courierid = {1} GROUP BY 1;".format(
+                    date_range, courier_id)
+            )
         return result

@@ -1,8 +1,8 @@
 # change order courier
 from aiogram.types import CallbackQuery, Message
-from tgbot.handlers.admin.order_interaction import generate_order_data_message
 
 from tgbot.handlers.customer.personal_profile import personal_profile
+from tgbot.handlers.manager.order_interaction import generate_order_data_message
 from tgbot.keyboards.default.user.personal_profile import personal_profile_kb
 from tgbot.keyboards.inline.customer.orders import my_orders_kb
 from tgbot.services.repository import Repo

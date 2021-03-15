@@ -1,8 +1,8 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
-from tgbot.handlers.admin.order_interaction import generate_order_data_message
 
 from tgbot.config import load_config
+from tgbot.handlers.manager.order_interaction import generate_order_data_message
 from tgbot.keyboards.default.user.check_order import check_order
 from tgbot.keyboards.default.user.choose_time import choose_time
 from tgbot.keyboards.default.user.main_menu import main_menu

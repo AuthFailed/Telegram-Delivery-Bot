@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, types
 
-from tgbot.handlers.customer.change_customer__data import change_user_data, user_choice, new_info
+from tgbot.handlers.customer.change_profile_data import change_user_data, user_choice, new_info
 from tgbot.handlers.customer.delete_profile import delete_profile, delete_profile_yes, delete_profile_no
 from tgbot.handlers.customer.order import order_starts, order_all_info, order_time, order_other_details, \
     order_user_choice, order_date
@@ -14,28 +14,28 @@ from tgbot.handlers.customer.tech_support import *
 from tgbot.keyboards.inline.customer.callback_data import calendar_callback
 from tgbot.keyboards.inline.customer.callback_data import choose_order
 from tgbot.models.role import UserRole
-from tgbot.states.user.change_user_info import ChangeUserInfo
+from tgbot.states.user.change_info import ChangeInfo
 from tgbot.states.user.delete_profile import DeleteProfile
 from tgbot.states.user.order import Order
 
 
 def register_customer(dp: Dispatcher):
     # start
-    dp.register_message_handler(user_start, commands=["start", "menu"], state="*", role=UserRole.USER,
+    dp.register_message_handler(start, commands=["start", "menu"], state="*",
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(user_start, text="🏠 Вернуться в меню", state="*", role=UserRole.USER,
+    dp.register_message_handler(start, text="🏠 Вернуться в меню", state="*",
                                 chat_type=types.ChatType.PRIVATE)
 
     # reg user
     dp.register_message_handler(reg_starts, text="✍️ Зарегистрироваться", role=UserRole.USER,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(reg_user_type, content_types=['text'], state=RegistrationUser.user_type,
+    dp.register_message_handler(reg_type, content_types=['text'], state=RegistrationUser.type,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(reg_user_name, content_types=['text'], state=RegistrationUser.name,
+    dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationUser.name,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(reg_user_address, content_types=['text'], state=RegistrationUser.address,
+    dp.register_message_handler(reg_address, content_types=['text'], state=RegistrationUser.address,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(reg_user_number, content_types=['text'], state=RegistrationUser.number,
+    dp.register_message_handler(reg_number, content_types=['text'], state=RegistrationUser.number,
                                 chat_type=types.ChatType.PRIVATE)
 
     # new order
@@ -64,13 +64,13 @@ def register_customer(dp: Dispatcher):
                                 chat_type=types.ChatType.PRIVATE)
     dp.register_message_handler(delete_profile, text="🔨 Удалить профиль", role=UserRole.USER,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", state=DeleteProfile.user_choice,
+    dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", state=DeleteProfile.choice,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)", state=DeleteProfile.user_choice,
+    dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)", state=DeleteProfile.choice,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(user_choice, state=ChangeUserInfo.user_choice, role=UserRole.USER,
+    dp.register_message_handler(user_choice, state=ChangeInfo.choice, role=UserRole.USER,
                                 chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(new_info, state=ChangeUserInfo.new_info, role=UserRole.USER,
+    dp.register_message_handler(new_info, state=ChangeInfo.new_info, role=UserRole.USER,
                                 chat_type=types.ChatType.PRIVATE)
 
     # price map

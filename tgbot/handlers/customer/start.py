@@ -5,7 +5,7 @@ from tgbot.keyboards.default.user.main_menu import main_menu
 from tgbot.services.repository import Repo
 
 
-async def user_start(m: Message, repo: Repo, state: FSMContext = None):
+async def start(m: Message, repo: Repo, state: FSMContext = None):
     if state is not None:
         await state.finish()
     is_user_exists = await repo.is_user_exists(user_id=m.chat.id)

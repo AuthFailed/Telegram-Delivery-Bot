@@ -1,5 +1,5 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class ChangeCourierStatus(StatesGroup):
+class ChangeStatus(StatesGroup):
     courier_choice = State()

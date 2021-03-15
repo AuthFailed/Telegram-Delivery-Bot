@@ -108,6 +108,7 @@ async def list_of_available_couriers(call: CallbackQuery, callback_data: dict, r
     available_couriers = await repo.get_available_couriers_list()
     await call.message.edit_reply_markup(
         reply_markup=await choose_courier_kb(order_id=callback_data['order_id'], courier_list=available_couriers))
+    await call.answer()
 
 
 async def set_order_courier(call: CallbackQuery, callback_data: dict, repo: Repo):
@@ -140,6 +141,7 @@ async def set_order_courier(call: CallbackQuery, callback_data: dict, repo: Repo
                                     parse_mode="Markdown",
                                     reply_markup=await courier_order_keyboard_kb(order_id=order_id))
         await call.answer(text=f"Курьер id{choosed_courier_id} назначен на выполнение заказа")
+    await call.answer()
 
 
 # Update order

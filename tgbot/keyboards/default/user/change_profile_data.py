@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
-async def change_user_info(user_type: str):
+async def change_profile_data(user_type: str):
     if user_type == "Компания":
         keyboard = ReplyKeyboardMarkup(
             resize_keyboard=True,

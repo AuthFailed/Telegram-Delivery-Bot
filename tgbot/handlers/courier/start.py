@@ -4,7 +4,7 @@ from aiogram.types import Message
 from tgbot.keyboards.default.courier.main_menu import main_menu
 
 
-async def courier_start(m: Message, state: FSMContext = None):
+async def start(m: Message, state: FSMContext = None):
     if state is not None:
         await state.finish()
 

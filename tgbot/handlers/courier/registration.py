@@ -11,7 +11,7 @@ from tgbot.services.repository import Repo
 from tgbot.states.user.registration import RegistrationCourier
 
 
-async def reg_courier_name(m: Message, state: FSMContext):
+async def reg_name(m: Message, state: FSMContext):
     await state.update_data(name=m.text)
 
     await m.reply(text="☎️ Введите *номер телефона* \(начиная с \+7\):", reply_markup=return_to_menu,
@@ -19,7 +19,7 @@ async def reg_courier_name(m: Message, state: FSMContext):
     await RegistrationCourier.next()
 
 
-async def reg_courier_number(m: Message, state: FSMContext):
+async def reg_number(m: Message, state: FSMContext):
     await state.update_data(number=m.text)
 
     await m.reply(text="💼 Отправьте *главную страницу паспорта*:",
@@ -28,7 +28,7 @@ async def reg_courier_number(m: Message, state: FSMContext):
     await RegistrationCourier.next()
 
 
-async def reg_courier_passport_main(m: Message, state: FSMContext):
+async def reg_passport_main(m: Message, state: FSMContext):
     await state.update_data(passport_main=m.photo[0].file_id)
 
     await m.reply(text="💼 А теперь отправьте *страницу паспорта с пропиской*:",
@@ -37,7 +37,7 @@ async def reg_courier_passport_main(m: Message, state: FSMContext):
     await RegistrationCourier.next()
 
 
-async def reg_courier_passport_registration(m: Message, state: FSMContext):
+async def reg_passport_registration(m: Message, state: FSMContext):
     await state.update_data(passport_registration=m.photo[0].file_id)
 
     await m.reply(text="💳 Отлично, отправьте *лицевую сторону водительского удостоверения*:",
@@ -46,7 +46,7 @@ async def reg_courier_passport_registration(m: Message, state: FSMContext):
     await RegistrationCourier.next()
 
 
-async def reg_courier_driving_license_front(m: Message, state: FSMContext):
+async def reg_driving_license_front(m: Message, state: FSMContext):
     await state.update_data(driving_license_front=m.photo[0].file_id)
 
     await m.reply("💳 А теперь отправьте *обратную сторону водительского удостоверения*:", reply_markup=return_to_menu,
@@ -54,7 +54,7 @@ async def reg_courier_driving_license_front(m: Message, state: FSMContext):
     await RegistrationCourier.next()
 
 
-async def reg_courier_driving_license_back(m: Message, repo: Repo, state: FSMContext):
+async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
     async with state.proxy() as data:
         data['driving_license_back'] = m.photo[0].file_id
         courier_data = data

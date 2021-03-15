@@ -1,6 +1,6 @@
 from aiogram.types import Message
-from tgbot.handlers.admin.order_interaction import generate_order_data_message
 
+from tgbot.handlers.manager.order_interaction import generate_order_data_message
 from tgbot.services.repository import Repo
 
 

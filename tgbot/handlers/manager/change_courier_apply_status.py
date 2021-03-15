@@ -9,7 +9,7 @@ async def change_courier_apply_status(call: CallbackQuery, callback_data: dict, 
     courier_id = callback_data.get("courier_id")
     status = True if callback_data.get("status") == 'True' else False
 
-    await repo.change_courier_apply_status(courier_id=courier_id, applied=status)
+    await repo.set_courier_apply_status(courier_id=courier_id, applied=status)
     courier_data = await repo.get_courier_by_userid(courier_id=courier_id)
     if status:
         await call.message.edit_text(text=f"""🚚 Курьер №{courier_data['id']} зарегистрирован

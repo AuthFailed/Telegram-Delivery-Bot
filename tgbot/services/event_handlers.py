@@ -15,7 +15,7 @@ async def new_customer(m: Message, customer_data, customer_id: int):
     event_message = f"""*Зарегистрирован аккаунт заказчика №{customer_id}*
 
 *👨‍💻 Данные аккаунта:*
-Тип: _{customer_data['user_type']}_
+Тип: _{customer_data['type']}_
 Лицо: _{customer_data['name']}_
 Адрес: _{customer_data['address']}_
 Номер телефона: {customer_data['number']}
@@ -29,9 +29,9 @@ _Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
 
 async def customer_changed_profile_data(m: Message, customer_id: int, customer_state_data, repo: Repo):
     customer_db_data = await repo.get_user(user_id=customer_id)
-    if customer_state_data['user_choice'] == "name":
+    if customer_state_data['choice'] == "name":
         changed_type = "Лицо"
-    elif customer_state_data['user_choice'] == "address":
+    elif customer_state_data['choice'] == "address":
         changed_type = "Адрес"
     else:
         changed_type = "Номер телефона"
@@ -39,7 +39,7 @@ async def customer_changed_profile_data(m: Message, customer_id: int, customer_s
 
 Тип данных: {changed_type}
 Изменение: 
-*{customer_db_data[customer_state_data['user_choice']]}* → *{customer_state_data['new_info']}*
+*{customer_db_data[customer_state_data['choice']]}* → *{customer_state_data['new_info']}*
 
 _Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
 
@@ -76,3 +76,7 @@ _Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
     await m.bot.send_message(chat_id=events_chat,
                              text=event_message,
                              parse_mode='Markdown')
+
+
+async def courier_delete_profile(m: Message, courier_data):
+    pass

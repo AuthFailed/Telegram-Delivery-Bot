@@ -2,7 +2,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class RegistrationUser(StatesGroup):
-    user_type = State()
+    type = State()
     name = State()
     address = State()
     number = State()

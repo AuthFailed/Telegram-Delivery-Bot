@@ -58,7 +58,7 @@ def create_calendar(year=datetime.now().year, month=datetime.now().month):
     for week in month_calendar:
         inline_kb.row()
         for day in week:
-            if (day == 0):
+            if day == 0:
                 inline_kb.insert(InlineKeyboardButton(" ", callback_data=ignore_callback))
             else:
                 inline_kb.insert(

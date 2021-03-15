@@ -5,6 +5,7 @@ import asyncpg
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from tgbot.config import load_config
 from tgbot.filters.role import RoleFilter, AdminFilter
@@ -14,6 +15,8 @@ from tgbot.handlers.groups import register_group
 from tgbot.handlers.manager import register_manager
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
+from tgbot.services import repository
+from tgbot.services.stats_sender import send_stats
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +59,13 @@ async def main():
     register_customer(dp)
 
     # register apscheduler
+    scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+    scheduler.start()
+    # scheduler.add_job(send_stats, 'interval', args=(bot, True, repository.Repo(pool)), seconds=10)
+    scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), hour=23, minute=0,
+                      replace_existing=True)  # Day stats
+    scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), day_of_week='Sun', hour=23, minute=0,
+                      replace_existing=True)  # week stats
 
     # start
     try:

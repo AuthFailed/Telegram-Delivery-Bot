@@ -48,16 +48,14 @@ class Repo:
         )
         return result
 
-    async def list_users(self) -> List[int]:
+    async def get_customers_list(self) -> List[int]:
         """List all bot users"""
-        return [
-            row[0]
-            async for row in self.conn.execute(
-                "select * from customers",
-            )
-        ]
+        result = await self.conn.fetch(
+            "select * from customers"
+        )
+        return result
 
-    async def delete_user(self, user_id: int):
+    async def delete_customer(self, user_id: int):
         """Remove user from DB"""
         await self.conn.execute(
             "DELETE FROM customers WHERE userid = $1",

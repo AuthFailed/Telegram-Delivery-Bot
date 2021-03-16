@@ -14,43 +14,39 @@ from tgbot.states.user.registration import RegistrationCourier
 async def reg_name(m: Message, state: FSMContext):
     await state.update_data(name=m.text)
 
-    await m.reply(text="☎️ Введите *номер телефона* \(начиная с \+7\):", reply_markup=return_to_menu,
-                  parse_mode="MarkdownV2")
+    await m.reply(text="☎️ Введите <b>номер телефона</b> (начиная с +7):", reply_markup=return_to_menu)
     await RegistrationCourier.next()
 
 
 async def reg_number(m: Message, state: FSMContext):
     await state.update_data(number=m.text)
 
-    await m.reply(text="💼 Отправьте *главную страницу паспорта*:",
-                  reply_markup=return_to_menu,
-                  parse_mode="MarkdownV2")
+    await m.reply(text="💼 Отправьте <b>главную страницу паспорта</b>:",
+                  reply_markup=return_to_menu)
     await RegistrationCourier.next()
 
 
 async def reg_passport_main(m: Message, state: FSMContext):
     await state.update_data(passport_main=m.photo[0].file_id)
 
-    await m.reply(text="💼 А теперь отправьте *страницу паспорта с пропиской*:",
-                  reply_markup=return_to_menu,
-                  parse_mode="MarkdownV2")
+    await m.reply(text="💼 А теперь отправьте <b>страницу паспорта с пропиской</b>:",
+                  reply_markup=return_to_menu)
     await RegistrationCourier.next()
 
 
 async def reg_passport_registration(m: Message, state: FSMContext):
     await state.update_data(passport_registration=m.photo[0].file_id)
 
-    await m.reply(text="💳 Отлично, отправьте *лицевую сторону водительского удостоверения*:",
-                  reply_markup=return_to_menu,
-                  parse_mode="MarkdownV2")
+    await m.reply(text="💳 Отлично, отправьте <b>лицевую сторону водительского удостоверения</b>:",
+                  reply_markup=return_to_menu)
     await RegistrationCourier.next()
 
 
 async def reg_driving_license_front(m: Message, state: FSMContext):
     await state.update_data(driving_license_front=m.photo[0].file_id)
 
-    await m.reply("💳 А теперь отправьте *обратную сторону водительского удостоверения*:", reply_markup=return_to_menu,
-                  parse_mode="MarkdownV2")
+    await m.reply("💳 А теперь отправьте <b>обратную сторону водительского удостоверения</b>:",
+                  reply_markup=return_to_menu)
     await RegistrationCourier.next()
 
 
@@ -76,18 +72,17 @@ async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
     media.attach_photo(courier_db_data[0]['driverlicensefront'])
     media.attach_photo(courier_db_data[0]['driverlicenseback'])
 
-    courier_message = f"""*🚚 Курьер №{courier_db_data[0]['id']} зарегистрирован*
+    courier_message = f"""<b>🚚 Курьер №{courier_db_data[0]['id']} зарегистрирован</b>
 
 👨 Данные:
-ФИО: `{courier_data['name']}`
+ФИО: <code>{courier_data['name']}</code>
 Номер: {courier_data['number']}
 
 ⏳ Статус заявки:
-_На рассмотрении_"""
+<i>На рассмотрении</i>"""
     courier_data_message = await m.bot.send_message(chat_id=config.tg_bot.couriers_group,
                                                     text=courier_message,
-                                                    reply_markup=await courier_request_kb(courier_id=m.chat.id),
-                                                    parse_mode="Markdown")
+                                                    reply_markup=await courier_request_kb(courier_id=m.chat.id))
     await new_courier(m=m, courier_data=courier_db_data[0])
     await courier_data_message.answer_media_group(media=media,
                                                   reply=True)

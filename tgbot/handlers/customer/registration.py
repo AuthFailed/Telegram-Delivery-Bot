@@ -10,28 +10,24 @@ from tgbot.states.user.registration import RegistrationUser, RegistrationCourier
 
 
 async def reg_starts(m: Message):
-    await m.answer(text="Зарегистрироваться как *компания*, *частное лицо* или *стать курьером*?",
-                   reply_markup=who_are_you,
-                   parse_mode="MarkdownV2")
+    await m.answer(text="Зарегистрироваться как <b>компания</b>, <b>частное лицо</b> или <b>стать курьером</b>?",
+                   reply_markup=who_are_you)
     await RegistrationUser.first()
 
 
 # user
 async def reg_type(m: Message, repo: Repo, state: FSMContext):
     if m.text == "👥 Компания":
-        await state.update_data(user_type="Компания")
-        await m.reply(text="Введите *название вашей компании*:", reply_markup=return_to_menu,
-                      parse_mode="MarkdownV2")
+        await state.update_data(type="Компания")
+        await m.reply(text="Введите <b>название вашей компании</b>:", reply_markup=return_to_menu)
         await RegistrationUser.next()
     elif m.text == "👨‍💻 Частное лицо":
-        await state.update_data(user_type='Частное лицо')
-        await m.reply(text="👤 Введите *ФИО*:", reply_markup=return_to_menu,
-                      parse_mode="MarkdownV2")
+        await state.update_data(type='Частное лицо')
+        await m.reply(text="👤 Введите <b>ФИО</b>:", reply_markup=return_to_menu)
         await RegistrationUser.next()
     elif m.text == "🚚 Стать курьером":
         await state.finish()
-        await m.reply(text="👤 Введите *ФИО*:", reply_markup=return_to_menu,
-                      parse_mode="MarkdownV2")
+        await m.reply(text="👤 Введите <b>ФИО</b>:", reply_markup=return_to_menu)
         await RegistrationCourier.first()
     else:
         is_user_exists = await repo.is_user_exists(user_id=m.chat.id)
@@ -50,14 +46,12 @@ async def reg_name(m: Message, repo: Repo, state: FSMContext):
             user_type = data['type']
 
         if user_type == "Компания":
-            await m.reply(text="📬 Введите *адрес компании*:",
-                          reply_markup=return_to_menu,
-                          parse_mode="MarkdownV2")
+            await m.reply(text="📬 Введите <b>адрес компании</b>:",
+                          reply_markup=return_to_menu)
         else:
-            await m.reply(text="📬 Введите *ваш адрес*:\n"
-                               "Например: Пушкина 20",
-                          reply_markup=return_to_menu,
-                          parse_mode="MarkdownV2")
+            await m.reply(text="📬 Введите <b>ваш адрес</b>:\n"
+                               "<i>Например: Пушкина 20</i>",
+                          reply_markup=return_to_menu)
         await RegistrationUser.next()
 
 
@@ -72,13 +66,11 @@ async def reg_address(m: Message, repo: Repo, state: FSMContext):
             user_type = data['type']
 
         if user_type == "Компания":
-            await m.reply(text="☎️ Введите *телефон компании*:",
-                          reply_markup=return_to_menu,
-                          parse_mode="MarkdownV2")
+            await m.reply(text="☎️ Введите <b>телефон компании</b>:",
+                          reply_markup=return_to_menu)
         else:
-            await m.reply(text="☎️ Введите *ваш номер телефона*:",
-                          reply_markup=return_to_menu,
-                          parse_mode="MarkdownV2")
+            await m.reply(text="☎️ Введите <b>ваш номер телефона</b>:",
+                          reply_markup=return_to_menu)
         await RegistrationUser.next()
 
 

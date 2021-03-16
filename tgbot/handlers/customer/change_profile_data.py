@@ -18,19 +18,19 @@ async def change_user_data(m: Message, repo: Repo):
 
 async def user_choice(m: Message, repo: Repo, state: FSMContext):
     if m.text == "👥 Название компании":
-        await state.update_data(user_choice="name")
+        await state.update_data(choice="name")
         await m.reply("👥 Введите новое название компании:", reply_markup=return_to_menu)
         await ChangeInfo.next()
     elif m.text == "👤 ФИО":
-        await state.update_data(user_choice="name")
+        await state.update_data(choice="name")
         await m.reply("👥 Введите ФИО:", reply_markup=return_to_menu)
         await ChangeInfo.next()
     elif m.text == "📬 Адрес":
-        await state.update_data(user_choice="address")
+        await state.update_data(choice="address")
         await m.reply("📬️ Введите новый адрес:", reply_markup=return_to_menu)
         await ChangeInfo.next()
     elif m.text == "☎️ Номер":
-        await state.update_data(user_choice="number")
+        await state.update_data(choice="number")
         await m.reply("☎️ Введите новый номер:", reply_markup=return_to_menu)
         await ChangeInfo.next()
     elif m.text == "✖️ Отмена":

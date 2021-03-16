@@ -9,17 +9,16 @@ async def personal_profile(m: Message, repo: Repo):
     user_orders = await repo.get_user_orders(user_id=m.chat.id)
     orders_number = len(user_orders)
 
-    answer_message = f"""*Информация об аккаунте №{user_data['id']}*
+    answer_message = f"""<b>Информация об аккаунте №{user_data['id']}</b>
 
-👨 *Общая информация*:
-Тип аккаунта: `{user_data['usertype']}`
-Лицо: `{user_data['name']}`
-Адрес: `{user_data['address']}`
-Номер: `{user_data['number']}`
+👨 <b>Общая информация</b>:
+Тип аккаунта: <code>{user_data['usertype']}</code>
+Лицо: <code>{user_data['name']}</code>
+Адрес: <code>{user_data['address']}</code>
+Номер: {user_data['number']}
 
-📦 *Заказы*:
-Общее кол\-во заказов: {orders_number}"""
+📦 <b>Заказы</b>:
+Общее кол-во заказов: {orders_number}"""
 
     await m.reply(text=answer_message,
-                  reply_markup=personal_profile_kb,
-                  parse_mode='MarkdownV2')
+                  reply_markup=personal_profile_kb)

@@ -4,17 +4,19 @@ import logging
 import asyncpg
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.contrib.fsm_storage.redis import RedisStorage
+from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from tgbot.config import load_config
 from tgbot.filters.role import RoleFilter, AdminFilter
+from tgbot.handlers.admin import register_admin
 from tgbot.handlers.courier import register_courier
 from tgbot.handlers.customer import register_customer
 from tgbot.handlers.groups import register_group
 from tgbot.handlers.manager import register_manager
 from tgbot.middlewares.db import DbMiddleware
 from tgbot.middlewares.role import RoleMiddleware
+from tgbot.middlewares.support import SupportMiddleware
 from tgbot.services import repository
 from tgbot.services.stats_sender import send_stats
 
@@ -35,7 +37,7 @@ async def main():
     config = load_config("bot.ini")
 
     if config.tg_bot.use_redis:
-        storage = RedisStorage()
+        storage = RedisStorage2()
     else:
         storage = MemoryStorage()
     pool = await create_pool(
@@ -45,18 +47,19 @@ async def main():
         host=config.db.host
     )
 
-    bot = Bot(token=config.tg_bot.token)
+    bot = Bot(token=config.tg_bot.token, parse_mode='html')
     dp = Dispatcher(bot, storage=storage)
     dp.middleware.setup(DbMiddleware(pool))
     dp.middleware.setup(RoleMiddleware(admin_id=config.tg_bot.admin_id))
+    dp.middleware.setup(SupportMiddleware(Dispatcher=dp))
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
 
-    # register_admin(dp)
+    register_admin(dp)
     register_manager(dp)
     register_courier(dp)
-    register_group(dp)
     register_customer(dp)
+    register_group(dp)
 
     # register apscheduler
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')

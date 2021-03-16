@@ -63,9 +63,11 @@ async def order_all_info(m: Message, repo: Repo, state: FSMContext):
                 order_datetime=order_datetime,
             )
             await m.answer(
-                text=f"""Напишите подробное описание того, что нужно купить или что нужно забрать курьеру
-Например: 1 литр молока Простоквашино, хлеб 1 буханка круглый и так далее,
-так же указать магазин в котором нужно купить (магнит,пятёрочка и т.д)""",
+                text=f"""Напишите подробное описание того, что нужно купить или забрать курьеру
+
+<i>Например:
+- В продуктовом магазине купить молоко и так далее по вашему списку 
+- В любом другом магазине по вашему запросу можем купить товар</i>""",
                 reply_markup=return_to_menu,
             )
             await Order.other_details.set()
@@ -89,9 +91,11 @@ async def order_time(m: Message, state: FSMContext):
     await state.update_data(order_time=m.text)
 
     await m.answer(
-        text=f"""Напишите подробное описание что нужно купить или что нужно забрать курьеру
-Например: 1 литр молока Простоквашино, хлеб 1 буханка круглый и так далее,
-так же указать магазин в котором нужно купить (магнит,пятёрочка и т.д)""",
+        text=f"""Напишите подробное описание что нужно купить или забрать курьеру
+
+<i>Например:
+- В продуктовом магазине купить молоко и так далее по вашему списку 
+- В любом другом магазине по вашему запросу можем купить товар</i>""",
         reply_markup=return_to_menu)
 
     await Order.other_details.set()
@@ -109,25 +113,24 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
         order_datetime = data['order_datetime']
 
     await m.reply(text=f"""🚩 Ваш заказ
-⏳ Статус: _Редактируется_    
-🚚 Курьер: _Не выбран_
+⏳ Статус: <i>Редактируется</i>    
+🚚 Курьер: <i>Не выбран</i>
 
 📤 Отправитель:
-Лицо: `{customer_data['name']}`
-Адрес: `{customer_data['address']}`
-Номер телефона: `{customer_data['number']}`
+Лицо: <code>{customer_data['name']}</code>
+Адрес: <code>{customer_data['address']}</code>
+Номер телефона: {customer_data['number']}
 
 📥 Получатель:
-ФИО: `{order_data['order_name']}`
-Номер: `{order_data['order_number']}`
-Адрес: `{order_data['order_address']}`
+ФИО: <code>{order_data['order_name']}</code>
+Номер: <code>{order_data['order_number']}</code>
+Адрес: {order_data['order_address']}
 
 📦 О заказе:
-Дата и время доставки: `{order_datetime}`
-Комментарий к заказу: `{order_data['other_details']}`
+Дата и время доставки: <code>{order_datetime}</code>
+Комментарий к заказу: <code>{order_data['other_details']}</code>
 """,
-                  reply_markup=check_order,
-                  parse_mode="Markdown")
+                  reply_markup=check_order)
     await Order.next()
 
 
@@ -160,14 +163,12 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
                                                                         is_company=True if customer_data[
                                                                                                "usertype"] == "Компания" else False,
                                                                         repo=repo),
-                                 reply_markup=await order_keyboard(order_id=order_id),
-                                 parse_mode="Markdown")
+                                 reply_markup=await order_keyboard(order_id=order_id))
 
         await m.answer(
             text=f"🚩 Заказ №{order_id} отправлен!\n"
-                 f"⏳ Статус: _Обрабатывается_",
-            reply_markup=ReplyKeyboardRemove(),
-            parse_mode="Markdown"
+                 f"⏳ Статус: <i>Обрабатывается</i>",
+            reply_markup=ReplyKeyboardRemove()
         )
         await state.finish()
         await m.answer(text="Главное меню",

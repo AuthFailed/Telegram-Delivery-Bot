@@ -8,18 +8,17 @@ async def get_courier(m: Message, repo: Repo):
     if len(args) > 0:
         try:
             courier_data = await repo.get_courier_by_id(courier_id=int(args))
-            answer_message = f"""*🔎 Информация о курьере №{courier_data["id"]}*
+            answer_message = f"""<b>🔎 Информация о курьере №{courier_data["id"]}</b>
 
 ФИО: {courier_data['name']}
 Номер телефона: {courier_data['number']}
 
 📦 Заказов взято: {len(await repo.get_couriers_orders(courier_id=int(args)))}"""
-            await m.reply(text=answer_message, parse_mode='Markdown')
+            await m.reply(text=answer_message)
         except TypeError:
-            await m.reply("*🔎 Курьера с таким номером не существует.*",
-                          parse_mode='Markdown')
+            await m.reply("<b>🔎 Курьера с таким номером не существует.</b>")
     else:
         answer_message = """Вводите команду /курьер в следующем формате:
 `/курьер 41`
 где 41 - номер курьера."""
-        await m.reply(text=answer_message, parse_mode='Markdown')
+        await m.reply(text=answer_message)

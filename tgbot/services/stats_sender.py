@@ -23,12 +23,12 @@ async def send_stats(bot: Bot, day: bool, repo: Repo):
                 sorted(couriers_stats.items(), key=lambda x: x[1], reverse=True)
                 first_courier_from_list = next(iter(couriers_stats))
                 courier_of_the_day = await repo.get_courier_by_userid(courier_id=first_courier_from_list)
-                courier_of_the_day = f"{courier_of_the_day['name']}\n№{courier_of_the_day['id']}"
+                courier_of_the_day = f"{courier_of_the_day['name']}\n<b>№{courier_of_the_day['id']}</b>"
 
-                message_to_send = f"""*Подведем итоги дня!*
+                message_to_send = f"""<b>Подведем итоги дня!</b>
     
-📦 Всего заказов за день: *{day_count}*
-Курьер дня: *{courier_of_the_day}*
+📦 Всего заказов за день: <b>{day_count}</b>
+Курьер дня: <b>{courier_of_the_day}</b>
     
 Статистика курьеров:
     """
@@ -39,18 +39,17 @@ async def send_stats(bot: Bot, day: bool, repo: Repo):
                     message_to_send += f"{i}. {courier_data['name']} (№{courier_data['id']}) - {couriers_stats[courier]}\n"
                     i += 1
             else:
-                message_to_send = f"""*Подведем итоги дня!*
+                message_to_send = f"""<b>Подведем итоги дня!</b>
 
-📦 Всего заказов за день: *{day_count}*
+📦 Всего заказов за день: <b>{day_count}</b>
 
-_Нет статистики по курьерам_"""
+<code>Нет статистики по курьерам</code>"""
         else:
-            message_to_send = f"""*Подведем итоги дня!*
+            message_to_send = f"""<b>Подведем итоги дня!</b>
             
 📦 Всего заказов за день: Заказов не было"""
-        await bot.send_message(chat_id=config.tg_bot.orders_group, text=message_to_send, parse_mode='Markdown')
+        await bot.send_message(chat_id=config.tg_bot.orders_group, text=message_to_send)
 
-    # courier_of_the_day = "Нет информации"
     else:
         orders = await repo.get_orders_count(date_range="week")
         if len(orders) > 0:
@@ -68,12 +67,12 @@ _Нет статистики по курьерам_"""
                 sorted(couriers_stats.items(), key=lambda x: x[1], reverse=True)
                 first_courier_from_list = next(iter(couriers_stats))
                 courier_of_the_week = await repo.get_courier_by_userid(courier_id=first_courier_from_list)
-                courier_of_the_week = f"{courier_of_the_week['name']}\n№{courier_of_the_week['id']}"
+                courier_of_the_week = f"{courier_of_the_week['name']}\n<b>№{courier_of_the_week['id']}</b>"
 
-                message_to_send = f"""*Подведем итоги недели!*
+                message_to_send = f"""<b>Подведем итоги недели!</b>
 
-📦 Всего заказов за неделю: *{day_count}*
-Курьер недели: *{courier_of_the_week}*
+📦 Всего заказов за неделю: <b>{day_count}</b>
+Курьер недели: <b>{courier_of_the_week}</b>
 
 Статистика курьеров:
             """
@@ -81,15 +80,15 @@ _Нет статистики по курьерам_"""
                 i = 1
                 for courier in couriers_stats:
                     courier_data = await repo.get_courier_by_userid(courier_id=courier)
-                    message_to_send += f"{i}. {courier_data['name']} (№{courier_data['id']}) - {couriers_stats[courier]}\n "
+                    message_to_send += f"{i}. {courier_data['name']} (№{courier_data['id']}) - {couriers_stats[courier]}\n"
                     i += 1
             else:
-                message_to_send = f"""*Подведем итоги недели!*
+                message_to_send = f"""<b>Подведем итоги недели!</b>
 
-📦 Всего заказов за неделю: *{day_count}*
+📦 Всего заказов за неделю: <b>{day_count}</b>
 
-_Нет статистики по курьерам_"""
+<i>Нет статистики по курьерам</i>"""
         else:
-            message_to_send = f"""*Подведем итоги недели!*
+            message_to_send = f"""<b>Подведем итоги недели!</b>
 📦 Всего заказов за неделю: Заказов не было"""
-        await bot.send_message(chat_id=config.tg_bot.orders_group, text=message_to_send, parse_mode='Markdown')
+        await bot.send_message(chat_id=config.tg_bot.orders_group, text=message_to_send)

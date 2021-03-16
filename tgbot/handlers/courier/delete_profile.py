@@ -18,10 +18,10 @@ async def delete_profile_yes(m: Message, state: FSMContext, repo: Repo):
     courier_data = await repo.get_courier_by_userid(courier_id=m.chat.id)
     await courier_delete_profile(m=m, courier_data=courier_data)
     await repo.delete_courier(courier_id=m.chat.id)
-    await m.reply(text="🔨 *Ваш аккаунт был удален\!*\n"
+    await m.reply(text="🔨 <b>Ваш аккаунт был удален\!</b>\n"
                        "Для повторной регистрации используйте команду /start",
                   reply_markup=ReplyKeyboardRemove(),
-                  parse_mode="MarkdownV2")
+                  parse_mode="html")
     await state.finish()
 
 

@@ -9,12 +9,11 @@ async def get_order(m: Message, repo: Repo):
     if len(args) > 0:
         try:
             answer_message = await generate_order_data_message(order_id=int(args), repo=repo, is_new=False)
-            await m.reply(text=answer_message, parse_mode='Markdown')
+            await m.reply(text=answer_message)
         except TypeError:
-            await m.reply("*🔎 Заказа с таким номером не существует.*",
-                          parse_mode='Markdown')
+            await m.reply("<b>🔎 Заказа с таким номером не существует.</b>")
     else:
         answer_message = """Вводите команду /заказ в следующем формате:
-/заказ 41
+<code>/заказ 41</code>
 где 41 - номер заказа."""
-        await m.reply(text=answer_message, parse_mode='Markdown')
+        await m.reply(text=answer_message)

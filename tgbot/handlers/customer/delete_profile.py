@@ -17,11 +17,10 @@ async def delete_profile(m: Message):
 async def delete_profile_yes(m: Message, state: FSMContext, repo: Repo):
     customer_data = await repo.get_user(user_id=m.chat.id)
     await customer_delete_profile(m=m, customer_data=customer_data)
-    await repo.delete_user(user_id=m.chat.id)
-    await m.reply(text="🔨 *Ваш аккаунт был удален\!*\n"
+    await repo.delete_customer(user_id=m.chat.id)
+    await m.reply(text="🔨 <b>Ваш аккаунт был удален!</b>\n"
                        "Для повторной регистрации используйте команду /start",
-                  reply_markup=ReplyKeyboardRemove(),
-                  parse_mode="MarkdownV2")
+                  reply_markup=ReplyKeyboardRemove())
     await state.finish()
 
 

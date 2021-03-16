@@ -12,19 +12,18 @@ now = datetime.now()
 
 # customers
 async def new_customer(m: Message, customer_data, customer_id: int):
-    event_message = f"""*Зарегистрирован аккаунт заказчика №{customer_id}*
+    event_message = f"""<b>Зарегистрирован аккаунт заказчика №{customer_id}</b>
 
-*👨‍💻 Данные аккаунта:*
-Тип: _{customer_data['type']}_
-Лицо: _{customer_data['name']}_
-Адрес: _{customer_data['address']}_
+<b>👨‍💻 Данные аккаунта:</b>
+Тип: <code>{customer_data['type']}</code>
+Лицо: <code>{customer_data['name']}</code>
+Адрес: <code>{customer_data['address']}</code>
 Номер телефона: {customer_data['number']}
 
-_Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
+<i>Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}</i>"""
 
     await m.bot.send_message(chat_id=events_chat,
-                             text=event_message,
-                             parse_mode='Markdown')
+                             text=event_message)
 
 
 async def customer_changed_profile_data(m: Message, customer_id: int, customer_state_data, repo: Repo):
@@ -35,47 +34,44 @@ async def customer_changed_profile_data(m: Message, customer_id: int, customer_s
         changed_type = "Адрес"
     else:
         changed_type = "Номер телефона"
-    event_message = f"""*Заказчик №{customer_db_data['id']} сменил личные данные*
+    event_message = f"""<b>Заказчик №{customer_db_data['id']} сменил личные данные</b>
 
 Тип данных: {changed_type}
 Изменение: 
-*{customer_db_data[customer_state_data['choice']]}* → *{customer_state_data['new_info']}*
+<b>{customer_db_data[customer_state_data['choice']]}</b> → <b>{customer_state_data['new_info']}</b>
 
-_Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
+<i>Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}</i>"""
 
     await m.bot.send_message(chat_id=events_chat,
-                             text=event_message,
-                             parse_mode='Markdown')
+                             text=event_message)
 
 
 async def customer_delete_profile(m: Message, customer_data):
-    event_message = f"""*Заказчик №{customer_data['id']} удален.*
+    event_message = f"""<b>Заказчик №{customer_data['id']} удален.</b>
 
-*👨‍💻 Данные аккаунта:*
-Лицо: _{customer_data['name']}_
-Адрес: _{customer_data['address']}_
+<b>👨‍💻 Данные аккаунта:</b>
+Лицо: <i>{customer_data['name']}</i>
+Адрес: <i>{customer_data['address']}</i>
 Номер: {customer_data['number']}
 
-_Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
+<i>Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}</i>"""
 
     await m.bot.send_message(chat_id=events_chat,
-                             text=event_message,
-                             parse_mode='Markdown')
+                             text=event_message)
 
 
 # courier
 async def new_courier(m: Message, courier_data):
-    event_message = f"""*Курьер №{courier_data['id']} зарегистрирован*
+    event_message = f"""<b>Курьер №{courier_data['id']} зарегистрирован</b>
 
-*👨‍💻 Данные аккаунта:*
+<b>👨‍💻 Данные аккаунта:</b>
 Имя: {courier_data['name']}
 Номер телефона: {courier_data['number']}
 
-_Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}_"""
+<i>Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}</i>"""
 
     await m.bot.send_message(chat_id=events_chat,
-                             text=event_message,
-                             parse_mode='Markdown')
+                             text=event_message)
 
 
 async def courier_delete_profile(m: Message, courier_data):

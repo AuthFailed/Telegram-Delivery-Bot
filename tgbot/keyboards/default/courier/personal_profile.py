@@ -5,7 +5,7 @@ personal_profile_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(
-                text="📦 Выполненные заказы"
+                text="📦 Мои заказы"
             ),
             KeyboardButton(
                 text="⏳ Сменить статус"

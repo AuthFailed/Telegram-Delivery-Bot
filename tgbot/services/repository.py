@@ -20,12 +20,18 @@ class Repo:
         )
         return result
 
-    async def get_user(self, user_id: int):
+    async def get_customer(self, user_id: int = None, id: int = None):
         """Get full user data from DB"""
-        result = await self.conn.fetchrow(
-            "SELECT * FROM customers WHERE UserId = $1",
-            user_id
-        )
+        if id is None:
+            result = await self.conn.fetchrow(
+                "SELECT * FROM customers WHERE UserId = $1",
+                user_id
+            )
+        else:
+            result = await self.conn.fetchrow(
+                "SELECT * FROM customers WHERE id = $1",
+                id
+            )
         return result
 
     async def change_user_column(self, user_id: int, column: str, data: str):
@@ -34,7 +40,7 @@ class Repo:
             "UPDATE customers SET {0} = \'{1}\' WHERE userid = {2}".format(column, data, user_id)
         )
 
-    async def get_user_orders(self, user_id: int):
+    async def get_customer_orders(self, user_id: int):
         rows = await self.conn.fetch(
             "SELECT * FROM orders WHERE customerid = $1 ORDER BY orderid DESC",
             user_id
@@ -80,18 +86,16 @@ class Repo:
         )
         return courier_data
 
-    async def get_courier_by_userid(self, courier_id: int):
+    async def get_courier(self, courier_id: int = None, id: int = None):
         """Get full user data from DB"""
-        result = await self.conn.fetchrow(
-            "SELECT * FROM couriers WHERE userid = {0}".format(courier_id)
-        )
-        return result
-
-    async def get_courier_by_id(self, courier_id: int):
-        """Get full user data from DB"""
-        result = await self.conn.fetchrow(
-            "SELECT * FROM couriers WHERE id = {0}".format(courier_id)
-        )
+        if id is None:
+            result = await self.conn.fetchrow(
+                "SELECT * FROM couriers WHERE userid = {0}".format(courier_id)
+            )
+        else:
+            result = await self.conn.fetchrow(
+                "SELECT * FROM couriers WHERE id = {0}".format(id)
+            )
         return result
 
     async def get_couriers_orders(self, courier_id: int):

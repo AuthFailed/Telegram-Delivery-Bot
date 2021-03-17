@@ -27,7 +27,7 @@ async def new_customer(m: Message, customer_data, customer_id: int):
 
 
 async def customer_changed_profile_data(m: Message, customer_id: int, customer_state_data, repo: Repo):
-    customer_db_data = await repo.get_user(user_id=customer_id)
+    customer_db_data = await repo.get_customer(user_id=customer_id)
     if customer_state_data['choice'] == "name":
         changed_type = "Лицо"
     elif customer_state_data['choice'] == "address":
@@ -75,4 +75,7 @@ async def new_courier(m: Message, courier_data):
 
 
 async def courier_delete_profile(m: Message, courier_data):
-    pass
+    event_message = f"""<b>Курьер №{courier_data['id']} удален.</b>"""
+
+    await m.bot.send_message(chat_id=events_chat,
+                             text=event_message)

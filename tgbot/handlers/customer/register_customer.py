@@ -5,15 +5,14 @@ from tgbot.handlers.customer.change_profile_data import change_user_data, user_c
 from tgbot.handlers.customer.delete_profile import delete_profile, delete_profile_yes, delete_profile_no
 from tgbot.handlers.customer.order import order_starts, order_all_info, order_time, order_other_details, \
     order_user_choice, order_date
-from tgbot.handlers.customer.orders_interaction import list_of_available_orders, get_order_info
+from tgbot.handlers.customer.orders_interaction import list_of_available_orders, show_chosen_page, show_item
 from tgbot.handlers.customer.our_services import our_services
 from tgbot.handlers.customer.personal_profile import personal_profile
 from tgbot.handlers.customer.price_map import price_map
 from tgbot.handlers.customer.registration import *
 from tgbot.handlers.customer.start import *
 from tgbot.handlers.customer.tech_support import *
-from tgbot.keyboards.inline.customer.callback_data import calendar_callback
-from tgbot.keyboards.inline.customer.callback_data import choose_order
+from tgbot.keyboards.inline.customer.callback_data import calendar_callback, pagination_call, show_item_data
 from tgbot.models.role import UserRole
 from tgbot.states.user.change_info import ChangeInfo
 from tgbot.states.user.delete_profile import DeleteProfile
@@ -59,8 +58,12 @@ def register_customer(dp: Dispatcher):
     # personal profile
     dp.register_message_handler(personal_profile, text="👨‍💻 Личный кабинет", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
+
+    # customer's orders
     dp.register_message_handler(list_of_available_orders, text="📦 Мои заказы", role=UserRole.USER)
-    dp.register_callback_query_handler(get_order_info, choose_order.filter())
+    dp.register_callback_query_handler(show_chosen_page, pagination_call.filter(key="items"), role=UserRole.USER)
+    dp.register_callback_query_handler(show_item, show_item_data.filter(), role=UserRole.USER)
+
     dp.register_message_handler(change_user_data, text="📋 Изменить данные", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(delete_profile, text="🔨 Удалить профиль", role=UserRole.USER,

@@ -10,7 +10,7 @@ from tgbot.states.user.change_info import ChangeInfo
 
 
 async def change_user_data(m: Message, repo: Repo):
-    user = await repo.get_user(user_id=m.chat.id)
+    user = await repo.get_customer(user_id=m.chat.id)
     await m.reply(text="🖊️ Выберите, какую информацию вы хотите изменить:",
                   reply_markup=await change_profile_data(user_type=user['usertype']))
     await ChangeInfo.first()

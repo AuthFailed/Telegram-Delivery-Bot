@@ -14,6 +14,7 @@ class DbConfig:
 class TgBot:
     token: str
     admin_id: int
+    managers: list[str]
     use_redis: bool
     orders_group: str
     couriers_group: str
@@ -42,6 +43,7 @@ def load_config(path: str):
         tg_bot=TgBot(
             token=tg_bot["token"],
             admin_id=int(tg_bot["admin_id"]),
+            managers=list(tg_bot["managers"].split(',')),
             use_redis=cast_bool(tg_bot.get("use_redis")),
             orders_group=tg_bot["orders_group"],
             couriers_group=tg_bot["couriers_group"],

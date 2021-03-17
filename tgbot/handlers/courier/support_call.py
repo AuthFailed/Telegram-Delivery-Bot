@@ -5,13 +5,13 @@ from tgbot.keyboards.inline.courier.support import support_keyboard, check_suppo
     cancel_support
 
 
-async def ask_support_call(message: Message, state: FSMContext):
+async def ask_support_call(m: Message, state: FSMContext):
     text = "Хотите связаться с техподдержкой? Нажмите на кнопку ниже!"
     keyboard = await support_keyboard(messages="many", state=state)
     if not keyboard:
-        await message.answer("К сожалению, сейчас нет свободных операторов. Попробуйте позже.")
+        await m.answer("К сожалению, сейчас нет свободных операторов. Попробуйте позже.")
         return
-    await message.answer(text, reply_markup=keyboard)
+    await m.answer(text, reply_markup=keyboard)
 
 
 async def send_to_support_call(c: CallbackQuery, state: FSMContext, callback_data: dict):
@@ -56,14 +56,16 @@ async def answer_support_call(c: CallbackQuery, state: FSMContext, callback_data
     keyboard_second_user = cancel_support(c.from_user.id)
 
     await c.message.edit_text("Вы на связи с пользователем!\n"
-                              "Чтобы завершить общение нажмите на кнопку.",
+                              "Чтобы завершить общение нажмите на кнопку в закрепленном сообщении.",
                               reply_markup=keyboard
                               )
-    await c.bot.send_message(second_id,
+    await c.message.pin()
+    support_message = await c.bot.send_message(second_id,
                              "Техподдержка на связи! Можете писать сюда свое сообщение. \n"
-                             "Чтобы завершить общение нажмите на кнопку.",
+                             "Чтобы завершить общение нажмите на кнопку в закрепленном сообщении.",
                              reply_markup=keyboard_second_user
                              )
+    await c.bot.pin_chat_message(chat_id=second_id, message_id=support_message.message_id)
 
 
 async def not_supported(m: Message, state: FSMContext):
@@ -83,6 +85,8 @@ async def exit_support(c: CallbackQuery, state: FSMContext, callback_data: dict)
         if int(second_id) == c.from_user.id:
             await state.storage.reset_state(chat=user_id, user=user_id)
             await c.bot.send_message(user_id, "Пользователь завершил сеанс техподдержки")
+        await c.bot.unpin_all_chat_messages(chat_id=second_id)
+        await c.bot.unpin_all_chat_messages(chat_id=user_id)
 
     await c.message.edit_text("Вы завершили сеанс")
     await state.reset_state()

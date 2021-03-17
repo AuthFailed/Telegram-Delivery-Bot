@@ -3,6 +3,7 @@ import random
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from tgbot.config import load_config
 from tgbot.keyboards.inline.manager.callback_data import support_callback, cancel_support_callback
 
 
@@ -16,7 +17,8 @@ async def check_support_available(support_id, state: FSMContext):
 
 
 async def get_support_manager(state: FSMContext):
-    support_ids = [1722307137, 418609567]  # @TODO записать всех менеджеров в бд
+    config = load_config("bot.ini")
+    support_ids = config.tg_bot.managers
     random.shuffle(support_ids)
     for support_id in support_ids:
         # Проверим если оператор в данное время не занят

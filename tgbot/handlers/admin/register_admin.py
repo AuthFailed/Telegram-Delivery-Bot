@@ -2,9 +2,13 @@ from aiogram import Dispatcher
 from aiogram.types import ChatType
 
 from tgbot.handlers.admin.broadcast import broadcast_text, broadcast_start, broadcast_image, broadcast_choice
+from tgbot.handlers.admin.get_courier import get_courier
+from tgbot.handlers.admin.get_customer import get_customer
+from tgbot.handlers.admin.get_order import get_order
 from tgbot.handlers.admin.manage_bot import manage_bot
 from tgbot.handlers.admin.servers_stats import servers_stats
 from tgbot.handlers.admin.start import start
+from tgbot.models.role import UserRole
 from tgbot.states.admin.post import Post
 
 
@@ -28,3 +32,11 @@ def register_admin(dp: Dispatcher):
                                 chat_type=ChatType.PRIVATE)
 
     dp.register_message_handler(servers_stats, text="⚙️ Статус сервера", is_admin=True, chat_type=ChatType.PRIVATE)
+
+    dp.register_message_handler(get_courier, commands=["курьер"], is_admin=True, chat_type=ChatType.PRIVATE)
+
+    # Get order info
+    dp.register_message_handler(get_order, commands=["заказ"], is_admin=True, chat_type=ChatType.PRIVATE)
+
+    # Get customer new_info
+    dp.register_message_handler(get_customer, commands=["заказчик"], is_admin=True, chat_type=ChatType.PRIVATE)

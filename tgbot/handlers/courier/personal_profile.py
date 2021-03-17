@@ -5,7 +5,7 @@ from tgbot.services.repository import Repo
 
 
 async def personal_profile(m: Message, repo: Repo):
-    user_data = await repo.get_courier_by_userid(courier_id=m.chat.id)
+    user_data = await repo.get_courier(courier_id=m.chat.id)
     user_orders = await repo.get_couriers_orders(courier_id=m.chat.id)
     orders_number = len(user_orders)
 

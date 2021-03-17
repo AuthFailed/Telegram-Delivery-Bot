@@ -17,7 +17,7 @@ async def order_starts(m: Message, repo: Repo):
     is_user_exists = await repo.is_user_exists(user_id=m.chat.id)
 
     if is_user_exists:
-        customer_data = await repo.get_user(user_id=m.chat.id)
+        customer_data = await repo.get_customer(user_id=m.chat.id)
         if customer_data['usertype'] == "Частное лицо":
             answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
         else:
@@ -28,7 +28,7 @@ async def order_starts(m: Message, repo: Repo):
 
 
 async def order_all_info(m: Message, repo: Repo, state: FSMContext):
-    customer_data = await repo.get_user(user_id=m.chat.id)
+    customer_data = await repo.get_customer(user_id=m.chat.id)
     user_type = customer_data['usertype']
     await state.update_data(user_type=user_type)
 
@@ -106,7 +106,7 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
     async with state.proxy() as data:
         data['other_details'] = other_details
         order_data = data
-    customer_data = await repo.get_user(user_id=m.chat.id)
+    customer_data = await repo.get_customer(user_id=m.chat.id)
     if 'order_datetime' not in data:
         order_datetime = f"{data['order_time']} {data['order_date']}"
     else:
@@ -137,7 +137,7 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
 async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
     if m.text == "👌 Все правильно":
         order_data = await state.get_data()
-        customer_data = await repo.get_user(user_id=m.chat.id)
+        customer_data = await repo.get_customer(user_id=m.chat.id)
         if 'order_datetime' not in order_data:
             order_datetime = f"{order_data['order_time']} {order_data['order_date']}"
         else:
@@ -159,10 +159,8 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         order_data = await repo.get_order(order_id=order_id)
         config = load_config("bot.ini")
         await m.bot.send_message(chat_id=config.tg_bot.orders_group,
-                                 text=await generate_order_data_message(order_data=order_data, is_new=True,
-                                                                        is_company=True if customer_data[
-                                                                                               "usertype"] == "Компания" else False,
-                                                                        repo=repo),
+                                 text=await generate_order_data_message(order_data=order_data,
+                                                                        is_new=True),
                                  reply_markup=await order_keyboard(order_id=order_id))
 
         await m.answer(
@@ -175,7 +173,7 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
                        reply_markup=await main_menu(reg=True))
     elif m.text == "🔄 Заполнить заново":
         await state.reset_data()
-        customer = await repo.get_user(user_id=m.chat.id)
+        customer = await repo.get_customer(user_id=m.chat.id)
         customer_type = customer['usertype']
 
         if customer_type == "Частное лицо":

@@ -39,7 +39,7 @@ async def broadcast_choice(m: Message, repo: Repo, state: FSMContext):
         broadcast_data = await state.get_data()
         i = 0
         for customer in customers_list:
-            await send_photo(bot=m.bot, repo=repo, user_id=customer['userid'], photo=broadcast_data['media'],
+            await send_photo(bot=m.bot, repo=repo, user_id=customer, photo=broadcast_data['media'],
                              caption=broadcast_data['text'])
             i += 1
         await state.finish()

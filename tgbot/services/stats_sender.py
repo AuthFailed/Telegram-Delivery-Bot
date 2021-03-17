@@ -22,7 +22,7 @@ async def send_stats(bot: Bot, day: bool, repo: Repo):
             if len(couriers_stats) > 0:
                 sorted(couriers_stats.items(), key=lambda x: x[1], reverse=True)
                 first_courier_from_list = next(iter(couriers_stats))
-                courier_of_the_day = await repo.get_courier_by_userid(courier_id=first_courier_from_list)
+                courier_of_the_day = await repo.get_courier(courier_id=first_courier_from_list)
                 courier_of_the_day = f"{courier_of_the_day['name']}\n<b>№{courier_of_the_day['id']}</b>"
 
                 message_to_send = f"""<b>Подведем итоги дня!</b>
@@ -35,7 +35,7 @@ async def send_stats(bot: Bot, day: bool, repo: Repo):
 
                 i = 1
                 for courier in couriers_stats:
-                    courier_data = await repo.get_courier_by_userid(courier_id=courier)
+                    courier_data = await repo.get_courier(courier_id=courier)
                     message_to_send += f"{i}. {courier_data['name']} (№{courier_data['id']}) - {couriers_stats[courier]}\n"
                     i += 1
             else:
@@ -66,7 +66,7 @@ async def send_stats(bot: Bot, day: bool, repo: Repo):
             if len(couriers_stats) > 0:
                 sorted(couriers_stats.items(), key=lambda x: x[1], reverse=True)
                 first_courier_from_list = next(iter(couriers_stats))
-                courier_of_the_week = await repo.get_courier_by_userid(courier_id=first_courier_from_list)
+                courier_of_the_week = await repo.get_courier(courier_id=first_courier_from_list)
                 courier_of_the_week = f"{courier_of_the_week['name']}\n<b>№{courier_of_the_week['id']}</b>"
 
                 message_to_send = f"""<b>Подведем итоги недели!</b>
@@ -79,7 +79,7 @@ async def send_stats(bot: Bot, day: bool, repo: Repo):
 
                 i = 1
                 for courier in couriers_stats:
-                    courier_data = await repo.get_courier_by_userid(courier_id=courier)
+                    courier_data = await repo.get_courier(courier_id=courier)
                     message_to_send += f"{i}. {courier_data['name']} (№{courier_data['id']}) - {couriers_stats[courier]}\n"
                     i += 1
             else:

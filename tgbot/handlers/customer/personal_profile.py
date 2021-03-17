@@ -5,8 +5,8 @@ from tgbot.services.repository import Repo
 
 
 async def personal_profile(m: Message, repo: Repo):
-    user_data = await repo.get_user(user_id=m.chat.id)
-    user_orders = await repo.get_user_orders(user_id=m.chat.id)
+    user_data = await repo.get_customer(user_id=m.chat.id)
+    user_orders = await repo.get_customer_orders(user_id=m.chat.id)
     orders_number = len(user_orders)
 
     answer_message = f"""<b>Информация об аккаунте №{user_data['id']}</b>

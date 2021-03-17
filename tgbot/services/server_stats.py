@@ -19,15 +19,12 @@ async def stats():
     procs = {}
     for pid in pids:
         p = psutil.Process(pid)
-        try:
-            pmem = p.memory_percent()
-            if pmem > 0.5:
-                if p.name() in procs:
-                    procs[p.name()] += pmem
-                else:
-                    procs[p.name()] = pmem
-        except:
-            print("Hm")
+        pmem = p.memory_percent()
+        if pmem > 0.5:
+            if p.name() in procs:
+                procs[p.name()] += pmem
+            else:
+                procs[p.name()] = pmem
     sortedprocs = sorted(procs.items(), key=operator.itemgetter(1), reverse=True)
     for proc in sortedprocs:
         pidsreply += proc[0] + " " + ("%.2f" % proc[1]) + " %\n"

@@ -10,6 +10,7 @@ async def get_courier(m: Message, repo: Repo):
             courier_data = await repo.get_courier(id=int(args))
             answer_message = f"""<b>🔎 Информация о курьере №{courier_data["id"]}</b>
 
+Статус: {courier_data['status']}
 ФИО: {courier_data['name']}
 Номер телефона: {courier_data['number']}
 

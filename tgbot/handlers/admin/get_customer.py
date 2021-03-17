@@ -5,11 +5,9 @@ from tgbot.services.repository import Repo
 
 async def get_customer(m: Message, repo: Repo):
     args = m.get_args()
-    print(args)
     if len(args) > 0:
         try:
             customer_data = await repo.get_customer(id=int(args))
-            print(customer_data)
             answer_message = f"""<b>🔎 Информация о заказчике №{customer_data["id"]}</b>
 
 ФИО: {customer_data['name']}

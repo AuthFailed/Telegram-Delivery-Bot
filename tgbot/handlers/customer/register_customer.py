@@ -15,7 +15,7 @@ from tgbot.handlers.customer.tech_support import *
 from tgbot.keyboards.inline.customer.callback_data import calendar_callback, pagination_call, show_item_data
 from tgbot.models.role import UserRole
 from tgbot.states.user.change_info import ChangeInfo
-from tgbot.states.user.delete_profile import DeleteProfile
+from tgbot.states.user.delete_profile import DeleteAccount
 from tgbot.states.user.order import Order
 
 
@@ -23,7 +23,7 @@ def register_customer(dp: Dispatcher):
     # start
     dp.register_message_handler(start, commands=["start", "menu"], state="*", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(start, text="🏠 Вернуться в меню", state="*", role=UserRole.USER,
+    dp.register_message_handler(start, text="🏠 Вернуться в меню", state="*",
                                 chat_type=ChatType.PRIVATE)
 
     # reg user
@@ -68,9 +68,9 @@ def register_customer(dp: Dispatcher):
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(delete_profile, text="🔨 Удалить профиль", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", state=DeleteProfile.choice,
+    dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", role=UserRole.USER, state=DeleteAccount.choice,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)", state=DeleteProfile.choice,
+    dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)", role=UserRole.USER, state=DeleteAccount.choice,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(user_choice, state=ChangeInfo.choice, role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)

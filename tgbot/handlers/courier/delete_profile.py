@@ -1,7 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from tgbot.handlers.customer.personal_profile import personal_profile
+from tgbot.handlers.courier.personal_profile import personal_profile
 from tgbot.keyboards.default.courier.delete_profile import delete_profile_kb
 from tgbot.services.event_handlers import courier_delete_profile
 from tgbot.services.repository import Repo

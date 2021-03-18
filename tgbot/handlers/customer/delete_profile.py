@@ -5,13 +5,13 @@ from tgbot.handlers.customer.personal_profile import personal_profile
 from tgbot.keyboards.default.user.delete_profile import delete_profile_kb
 from tgbot.services.event_handlers import customer_delete_profile
 from tgbot.services.repository import Repo
-from tgbot.states.user.delete_profile import DeleteProfile
+from tgbot.states.user.delete_profile import DeleteAccount
 
 
 async def delete_profile(m: Message):
     await m.reply("‼️ Вы уверены, что хотите удалить свой профиль?\n"
                   "Оформленные вами заказы станут доступны при повторной регистрации.", reply_markup=delete_profile_kb)
-    await DeleteProfile.first()
+    await DeleteAccount.first()
 
 
 async def delete_profile_yes(m: Message, state: FSMContext, repo: Repo):

@@ -36,8 +36,8 @@ async def generate_order_data_message(order_data, courier_data=None, is_new: boo
 
 📥 Получатель:
 ФИО: <code>{order_data['ordername']}</code>
-Номер: <code>{order_data['ordernumber']}</code>
-Адрес: {order_data['orderaddress']}
+Адрес: <code>{order_data['orderaddress']}</code>
+Номер телефона: {order_data['ordernumber']}
 
 📦 О заказе:
 Дата и время доставки: <code>{order_data['ordertime']}</code>
@@ -77,15 +77,18 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
         await repo.change_order_status(order_id=order_id, order_status=order_status)
         order_data = await repo.get_order(order_id=order_id)
         courier_id = order_data['courierid']
-        if courier_id is not None:
+        if call.message.chat.id not in couriers_list:
             await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,
                                                                                 courier_data=await repo.get_courier(
                                                                                     courier_id) if courier_id is not None else None,
                                                                                 is_new=False),
                                          reply_markup=await order_keyboard(order_id=order_id))
         else:
-            await call.message.edit_text(text=await generate_order_data_message(order_data=order_data, is_new=False),
-                                         reply_markup=await order_keyboard(order_id=order_id))
+            await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,
+                                                                                courier_data=await repo.get_courier(
+                                                                                    courier_id) if courier_id is not None else None,
+                                                                                is_new=False),
+                                         reply_markup=await courier_order_keyboard_kb(order_id=order_id))
         await call.bot.send_message(chat_id=order_data['customerid'],
                                     text=f"🚩 Статус заказа №{order_id} обновлен!\n"
                                          f"⏳ Статус: <i>{order_data['status']}</i>")
@@ -151,7 +154,8 @@ async def set_order_courier(call: CallbackQuery, callback_data: dict, repo: Repo
                                                                                courier_id) if courier_id is not None else None,
                                                                            is_new=False),
                                     reply_markup=await courier_order_keyboard_kb(order_id=order_id))
-        await call.answer(text=f"Курьер {courier_data['name']} назначен на выполнение заказа",
+        await call.message.answer(text=f"🚩 Курьер заказа №{order_id} изменен!\n🚚 Курьер: №{courier_data['id']} {courier_data['name']}")
+        await call.answer(text=f"Заказ {courier_data['name']} назначен на выполнение заказа",
                           show_alert=True)
     await call.answer()
 

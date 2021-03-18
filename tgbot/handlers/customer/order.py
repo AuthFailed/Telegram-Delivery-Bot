@@ -19,9 +19,9 @@ async def order_starts(m: Message, repo: Repo):
     if is_user_exists:
         customer_data = await repo.get_customer(user_id=m.chat.id)
         if customer_data['usertype'] == "Частное лицо":
-            answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
         else:
-            answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
         await m.reply(text=answer_message,
                       reply_markup=return_to_menu)
         await Order.first()
@@ -177,9 +177,9 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         customer_type = customer['usertype']
 
         if customer_type == "Частное лицо":
-            answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
         else:
-            answer_message = "Введите данные в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
         await m.answer(
             text=answer_message,
             reply_markup=return_to_menu,

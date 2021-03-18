@@ -3,6 +3,17 @@ from aiogram.types import Message, CallbackQuery
 
 from tgbot.keyboards.inline.courier.support import support_keyboard, check_support_available, get_support_manager, \
     cancel_support
+from tgbot.services.repository import Repo
+
+
+async def ask_support_call_callback(call: CallbackQuery, state: FSMContext):
+    text = "Хотите связаться с техподдержкой? Нажмите на кнопку ниже!"
+    keyboard = await support_keyboard(messages="many", state=state)
+    if not keyboard:
+        await call.message.answer("К сожалению, сейчас нет свободных операторов. Попробуйте позже.")
+        return
+    await call.message.answer(text=text, reply_markup=keyboard)
+    await call.answer()
 
 
 async def ask_support_call(m: Message, state: FSMContext):
@@ -11,10 +22,10 @@ async def ask_support_call(m: Message, state: FSMContext):
     if not keyboard:
         await m.answer("К сожалению, сейчас нет свободных операторов. Попробуйте позже.")
         return
-    await m.answer(text, reply_markup=keyboard)
+    await m.answer(text=text, reply_markup=keyboard)
 
 
-async def send_to_support_call(c: CallbackQuery, state: FSMContext, callback_data: dict):
+async def send_to_support_call(c: CallbackQuery, state: FSMContext, callback_data: dict, repo: Repo):
     await c.message.edit_text("Вы обратились в техподдержку. Ждем ответа от оператора!")
 
     user_id = int(callback_data.get("user_id"))
@@ -33,13 +44,14 @@ async def send_to_support_call(c: CallbackQuery, state: FSMContext, callback_dat
 
     keyboard = await support_keyboard(messages="many", user_id=c.from_user.id, state=state)
 
+    courier_data = await repo.get_courier(courier_id=c.from_user.id)
     await c.bot.send_message(support_id,
-                             f"С вами хочет связаться пользователь {c.from_user.full_name}",
+                             f"С вами хочет связаться курьер <b>№{courier_data['id']} {c.from_user.full_name}</b>",
                              reply_markup=keyboard
                              )
 
 
-async def answer_support_call(c: CallbackQuery, state: FSMContext, callback_data: dict):
+async def answer_support_call(c: CallbackQuery, state: FSMContext, callback_data: dict, repo: Repo):
     second_id = int(callback_data.get("user_id"))
     user_state = await state.storage.get_state(user=second_id, chat=second_id)
 
@@ -55,16 +67,18 @@ async def answer_support_call(c: CallbackQuery, state: FSMContext, callback_data
     keyboard = cancel_support(second_id)
     keyboard_second_user = cancel_support(c.from_user.id)
 
-    await c.message.edit_text("Вы на связи с пользователем!\n"
+    courier_data = await repo.get_courier(courier_id=second_id)
+
+    await c.message.edit_text(f"Вы на связи с курьером <b>№{courier_data['id']} {courier_data['name']}</b>!\n"
                               "Чтобы завершить общение нажмите на кнопку в закрепленном сообщении.",
                               reply_markup=keyboard
                               )
     await c.message.pin()
     support_message = await c.bot.send_message(second_id,
-                             "Техподдержка на связи! Можете писать сюда свое сообщение. \n"
-                             "Чтобы завершить общение нажмите на кнопку в закрепленном сообщении.",
-                             reply_markup=keyboard_second_user
-                             )
+                                               "Тех. поддержка на связи! Можете писать сюда свое сообщение. \n"
+                                               "Чтобы завершить общение нажмите на кнопку в закрепленном сообщении.",
+                                               reply_markup=keyboard_second_user
+                                               )
     await c.bot.pin_chat_message(chat_id=second_id, message_id=support_message.message_id)
 
 
@@ -84,7 +98,7 @@ async def exit_support(c: CallbackQuery, state: FSMContext, callback_data: dict)
         second_id = second_state.get("second_id")
         if int(second_id) == c.from_user.id:
             await state.storage.reset_state(chat=user_id, user=user_id)
-            await c.bot.send_message(user_id, "Пользователь завершил сеанс техподдержки")
+            await c.bot.send_message(user_id, "Сеанс тех. поддержки завершен.")
         await c.bot.unpin_all_chat_messages(chat_id=second_id)
         await c.bot.unpin_all_chat_messages(chat_id=user_id)
 

@@ -11,15 +11,14 @@ from tgbot.states.admin.post import Post
 async def broadcast_start(m: Message):
     await m.reply(text="""📜 <b>Введите рассылаемый текст:</b>
 
-<i>Подсказка: Текст форматируется в формате HTMl, о котором можно почитать <a href='https://core.telegram.org/api/entities'>здесь</a>.
-HTML-форматирование представляет собой использование тегов по типу a href (link), b (bold), i (italic).</i>""",
+<i>Подсказка: Текст поддерживает форматирование.""",
                   reply_markup=return_to_menu,
                   disable_web_page_preview=True)
     await Post.first()
 
 
 async def broadcast_text(m: Message, state: FSMContext):
-    await state.update_data(text=m.text)
+    await state.update_data(text=m.html_text)
 
     await m.reply(text="🖼️ Теперь пришли мне картинку:")
     await Post.next()
@@ -39,7 +38,7 @@ async def broadcast_choice(m: Message, repo: Repo, state: FSMContext):
         broadcast_data = await state.get_data()
         i = 0
         for customer in customers_list:
-            await send_photo(bot=m.bot, repo=repo, user_id=customer, photo=broadcast_data['media'],
+            await send_photo(bot=m.bot, repo=repo, user_id=customer["userid"], photo=broadcast_data['media'],
                              caption=broadcast_data['text'])
             i += 1
         await state.finish()

@@ -1,5 +1,5 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class DeleteProfile(StatesGroup):
+class DeleteAccount(StatesGroup):
     choice = State()

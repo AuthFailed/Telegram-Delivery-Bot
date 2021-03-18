@@ -9,7 +9,7 @@ from tgbot.handlers.courier.registration import reg_name, reg_number, reg_passpo
     reg_passport_registration, reg_driving_license_front, reg_driving_license_back
 from tgbot.handlers.courier.start import start
 from tgbot.handlers.courier.support_call import ask_support_call, send_to_support_call, answer_support_call, \
-    not_supported, exit_support
+    not_supported, exit_support, ask_support_call_callback
 from tgbot.keyboards.inline.courier.callback_data import show_item_data, pagination_call
 from tgbot.keyboards.inline.manager.callback_data import support_callback, cancel_support_callback, order
 from tgbot.models.role import UserRole
@@ -23,7 +23,7 @@ def register_courier(dp: Dispatcher):
     dp.register_message_handler(start, commands=["start", "menu"], state="*", role=UserRole.COURIER,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(start, text="🏠 Вернуться в меню", state="*",
-                                chat_type=ChatType.PRIVATE)
+                                chat_type=ChatType.PRIVATE, role=UserRole.COURIER)
 
     # reg courier
     dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationCourier.name,
@@ -61,10 +61,10 @@ def register_courier(dp: Dispatcher):
     dp.register_message_handler(delete_profile, text="🔨 Удалить профиль", role=UserRole.COURIER,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", state=DeleteAccount.choice,
-                                chat_type=ChatType.PRIVATE)
+                                chat_type=ChatType.PRIVATE, role=UserRole.COURIER)
     dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)",
                                 state=DeleteAccount.choice,
-                                chat_type=ChatType.PRIVATE)
+                                chat_type=ChatType.PRIVATE, role=UserRole.COURIER)
 
     # Тех поддержка
     dp.register_message_handler(ask_support_call, text="🙋 Тех. поддержка", role=UserRole.COURIER,
@@ -74,5 +74,5 @@ def register_courier(dp: Dispatcher):
     dp.register_callback_query_handler(answer_support_call, support_callback.filter(messages="many", as_user="no"), chat_type=ChatType.PRIVATE)
     dp.register_message_handler(not_supported, state="wait_in_support", content_types=ContentTypes.ANY, chat_type=ChatType.PRIVATE)
     dp.register_callback_query_handler(exit_support, cancel_support_callback.filter(),
-                                       state=["in_support", "wait_in_support", None])
-    dp.register_callback_query_handler(ask_support_call, order.filter(item="contact_with_manager"))
+                                       state=["in_support", "wait_in_support", None], role=UserRole.COURIER)
+    dp.register_callback_query_handler(ask_support_call_callback, order.filter(item="contact_with_manager"), role=UserRole.COURIER)

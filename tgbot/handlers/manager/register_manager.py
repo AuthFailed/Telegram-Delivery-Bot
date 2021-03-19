@@ -23,23 +23,24 @@ def register_manager(dp: Dispatcher):
     # order
     dp.register_callback_query_handler(change_order_status_kb, order.filter(item="change_status"),
                                        role=[UserRole.MANAGER, UserRole.COURIER,
-                                       UserRole.ADMIN])
+                                             UserRole.ADMIN])
     dp.register_callback_query_handler(list_of_available_couriers, order.filter(item="choose_courier"),
                                        role=[UserRole.MANAGER,
-                                       UserRole.ADMIN])
-    dp.register_callback_query_handler(update_order_info, order.filter(item="update_info"), role=[UserRole.MANAGER, UserRole.COURIER,
-                                       UserRole.ADMIN])
-    dp.register_callback_query_handler(change_order_status_db, order_status.filter(), role=[UserRole.MANAGER, UserRole.COURIER,
-                                       UserRole.ADMIN])
+                                             UserRole.ADMIN])
+    dp.register_callback_query_handler(update_order_info, order.filter(item="update_info"),
+                                       role=[UserRole.MANAGER, UserRole.COURIER,
+                                             UserRole.ADMIN])
+    dp.register_callback_query_handler(change_order_status_db, order_status.filter(),
+                                       role=[UserRole.MANAGER, UserRole.COURIER,
+                                             UserRole.ADMIN])
     dp.register_callback_query_handler(set_order_courier, choose_courier.filter(), role=[UserRole.MANAGER,
-                                       UserRole.ADMIN])
+                                                                                         UserRole.ADMIN])
 
     dp.register_callback_query_handler(current_page_error, pagination_call.filter(page="current_page"))
 
-
     # new courier registered
     dp.register_callback_query_handler(change_courier_apply_status, new_courier.filter(), role=[UserRole.MANAGER,
-                                       UserRole.ADMIN])
+                                                                                                UserRole.ADMIN])
 
     dp.register_message_handler(get_courier, commands=["курьер"], chat_type=ChatType.PRIVATE, role=UserRole.MANAGER)
 

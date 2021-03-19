@@ -70,9 +70,13 @@ def register_courier(dp: Dispatcher):
     dp.register_message_handler(ask_support_call, text="🙋 Тех. поддержка", role=UserRole.COURIER,
                                 chat_type=ChatType.PRIVATE)
 
-    dp.register_callback_query_handler(send_to_support_call, support_callback.filter(messages="many", as_user="yes"), chat_type=ChatType.PRIVATE)
-    dp.register_callback_query_handler(answer_support_call, support_callback.filter(messages="many", as_user="no"), chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(not_supported, state="wait_in_support", content_types=ContentTypes.ANY, chat_type=ChatType.PRIVATE)
+    dp.register_callback_query_handler(send_to_support_call, support_callback.filter(messages="many", as_user="yes"),
+                                       chat_type=ChatType.PRIVATE)
+    dp.register_callback_query_handler(answer_support_call, support_callback.filter(messages="many", as_user="no"),
+                                       chat_type=ChatType.PRIVATE)
+    dp.register_message_handler(not_supported, state="wait_in_support", content_types=ContentTypes.ANY,
+                                chat_type=ChatType.PRIVATE)
     dp.register_callback_query_handler(exit_support, cancel_support_callback.filter(),
                                        state=["in_support", "wait_in_support", None], role=UserRole.COURIER)
-    dp.register_callback_query_handler(ask_support_call_callback, order.filter(item="contact_with_manager"), role=UserRole.COURIER)
+    dp.register_callback_query_handler(ask_support_call_callback, order.filter(item="contact_with_manager"),
+                                       role=UserRole.COURIER)

@@ -1,5 +1,7 @@
 from typing import List
 
+import asyncpg
+
 
 class Repo:
     """Db abstraction layer"""
@@ -106,14 +108,14 @@ class Repo:
         )
         return [dict(row) for row in rows]
 
-    async def get_couriers_list(self):
+    async def get_couriers_list(self) -> list[any]:
         """Get couriers list"""
         rows = await self.conn.fetch(
             "SELECT userid FROM couriers"
         )
         return [dict(row) for row in rows]
 
-    async def get_available_couriers_list(self):
+    async def get_available_couriers_list(self) -> list[any]:
         """Get available couriers from DB"""
         rows = await self.conn.fetch(
             "SELECT * from couriers WHERE applied = True"

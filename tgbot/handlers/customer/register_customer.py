@@ -68,9 +68,11 @@ def register_customer(dp: Dispatcher):
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(delete_profile, text="🔨 Удалить профиль", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", role=UserRole.USER, state=DeleteAccount.choice,
+    dp.register_message_handler(delete_profile_yes, text="✅ Да, я уверен(а)", role=UserRole.USER,
+                                state=DeleteAccount.choice,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)", role=UserRole.USER, state=DeleteAccount.choice,
+    dp.register_message_handler(delete_profile_no, text="✖️ Нет, я передумал(а)", role=UserRole.USER,
+                                state=DeleteAccount.choice,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(user_choice, state=ChangeInfo.choice, role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)

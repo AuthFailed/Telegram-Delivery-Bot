@@ -154,7 +154,8 @@ async def set_order_courier(call: CallbackQuery, callback_data: dict, repo: Repo
                                                                                courier_id) if courier_id is not None else None,
                                                                            is_new=False),
                                     reply_markup=await courier_order_keyboard_kb(order_id=order_id))
-        await call.message.answer(text=f"🚩 Курьер заказа №{order_id} изменен!\n🚚 Курьер: №{courier_data['id']} {courier_data['name']}")
+        await call.message.answer(
+            text=f"🚩 Курьер заказа №{order_id} изменен!\n🚚 Курьер: №{courier_data['id']} {courier_data['name']}")
         await call.answer(text=f"Заказ {courier_data['name']} назначен на выполнение заказа",
                           show_alert=True)
     await call.answer()

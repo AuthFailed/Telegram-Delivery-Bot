@@ -8,7 +8,6 @@ from tgbot.handlers.admin.get_order import get_order
 from tgbot.handlers.admin.manage_bot import manage_bot
 from tgbot.handlers.admin.servers_stats import servers_stats
 from tgbot.handlers.admin.start import start
-from tgbot.models.role import UserRole
 from tgbot.states.admin.post import Post
 
 

@@ -1,6 +1,6 @@
 from aiogram.types import Message
 
-from tgbot.keyboards.default.user.return_to_menu import return_to_menu
+from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
 
 
 async def price_map(m: Message):

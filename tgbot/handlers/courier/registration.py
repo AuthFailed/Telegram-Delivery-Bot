@@ -1,20 +1,31 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from tgbot.config import load_config
 from tgbot.keyboards.default.courier.main_menu import main_menu
-from tgbot.keyboards.default.user.return_to_menu import return_to_menu
+from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
+from tgbot.keyboards.inline.customer.cities import cities
 from tgbot.keyboards.inline.manager.accept_courier import courier_request_kb
 from tgbot.services.event_handlers import new_courier
 from tgbot.services.repository import Repo
-from tgbot.states.user.registration import RegistrationCourier
+from tgbot.states.customer.registration import RegistrationCourier
 
 
-async def reg_name(m: Message, state: FSMContext):
+async def reg_name(m: Message, repo: Repo, state: FSMContext):
     await state.update_data(name=m.text)
 
-    await m.reply(text="☎️ Введите <b>номер телефона</b> (начиная с +7):", reply_markup=return_to_menu)
+    cities_list = await repo.get_available_cities()
+    await m.reply(text="📬 Выберите ваш город из списка",
+                  reply_markup=await cities(cities_list=cities_list))
+    await RegistrationCourier.next()
+
+
+async def reg_city(c: CallbackQuery, callback_data: dict, state: FSMContext):
+    await state.update_data(city=callback_data['city_name'].lower())
+    await c.answer(text=f"Выбран город {callback_data['city_name']}")
+
+    await c.message.reply(text="📱️ Введите <b>номер телефона</b> (начиная с +7):", reply_markup=return_to_menu)
     await RegistrationCourier.next()
 
 
@@ -56,6 +67,7 @@ async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
         courier_data = data
 
     courier_db_data = await repo.add_courier(user_id=m.chat.id, name=courier_data['name'],
+                                             city=courier_data['city'],
                                              number=courier_data['number'],
                                              passport_main_id=courier_data['passport_main'],
                                              passport_registration_id=courier_data['passport_registration'],
@@ -76,13 +88,17 @@ async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
 
 👨 Данные:
 ФИО: <code>{courier_data['name']}</code>
+Город: <code>{courier_data['city']}</code>
 Номер: {courier_data['number']}
 
 ⏳ Статус заявки:
 <i>На рассмотрении</i>"""
-    courier_data_message = await m.bot.send_message(chat_id=config.tg_bot.couriers_group,
+
+    city_data = await repo.get_partner(city=courier_data['city'])
+    courier_data_message = await m.bot.send_message(chat_id=city_data['couriersgroupid'],
                                                     text=courier_message,
                                                     reply_markup=await courier_request_kb(courier_id=m.chat.id))
-    await new_courier(m=m, courier_data=courier_db_data[0])
+    if city_data['couriersgroupid'] is not None:
+        await new_courier(m=m, courier_data=courier_db_data[0])
     await courier_data_message.answer_media_group(media=media,
                                                   reply=True)

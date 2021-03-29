@@ -6,16 +6,17 @@ from tgbot.handlers.courier.delete_profile import delete_profile, delete_profile
 from tgbot.handlers.courier.orders_interaction import list_of_available_orders, show_chosen_page, show_item
 from tgbot.handlers.courier.personal_profile import personal_profile
 from tgbot.handlers.courier.registration import reg_name, reg_number, reg_passport_main, \
-    reg_passport_registration, reg_driving_license_front, reg_driving_license_back
+    reg_passport_registration, reg_driving_license_front, reg_driving_license_back, reg_city
 from tgbot.handlers.courier.start import start
 from tgbot.handlers.courier.support_call import ask_support_call, send_to_support_call, answer_support_call, \
     not_supported, exit_support, ask_support_call_callback
 from tgbot.keyboards.inline.courier.callback_data import show_item_data, pagination_call
+from tgbot.keyboards.inline.customer.callback_data import registration_city
 from tgbot.keyboards.inline.manager.callback_data import support_callback, cancel_support_callback, order
 from tgbot.models.role import UserRole
 from tgbot.states.courier.change_status import ChangeStatus
 from tgbot.states.courier.delete_profile import DeleteAccount
-from tgbot.states.user.registration import RegistrationCourier
+from tgbot.states.customer.registration import RegistrationCourier
 
 
 def register_courier(dp: Dispatcher):
@@ -28,6 +29,7 @@ def register_courier(dp: Dispatcher):
     # reg courier
     dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationCourier.name,
                                 chat_type=ChatType.PRIVATE)
+    dp.register_callback_query_handler(reg_city, registration_city.filter(), state=RegistrationCourier.city)
     dp.register_message_handler(reg_number, content_types=['text'], state=RegistrationCourier.number,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(reg_passport_main, content_types=['photo'],

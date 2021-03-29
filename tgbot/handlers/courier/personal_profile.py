@@ -15,6 +15,7 @@ async def personal_profile(m: Message, repo: Repo):
 Тип аккаунта: <code>Курьер</code>
 Статус: <code>{user_data['status']}</code>
 Лицо: <code>{user_data['name']}</code>
+Город: <code>{user_data['city'].title()}</code>
 Номер: {user_data['number']}
 
 📦 <b>Заказы</b>:

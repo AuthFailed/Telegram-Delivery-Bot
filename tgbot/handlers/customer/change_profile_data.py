@@ -2,11 +2,11 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
 from tgbot.handlers.customer.personal_profile import personal_profile
-from tgbot.keyboards.default.user.change_profile_data import change_profile_data
-from tgbot.keyboards.default.user.return_to_menu import return_to_menu
+from tgbot.keyboards.default.customer.change_profile_data import change_profile_data
+from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
 from tgbot.services.event_handlers import customer_changed_profile_data
 from tgbot.services.repository import Repo
-from tgbot.states.user.change_info import ChangeInfo
+from tgbot.states.customer.change_info import ChangeInfo
 
 
 async def change_user_data(m: Message, repo: Repo):
@@ -29,9 +29,9 @@ async def user_choice(m: Message, repo: Repo, state: FSMContext):
         await state.update_data(choice="address")
         await m.reply("📬️ Введите новый адрес:", reply_markup=return_to_menu)
         await ChangeInfo.next()
-    elif m.text == "☎️ Номер":
+    elif m.text == "📱️ Номер":
         await state.update_data(choice="number")
-        await m.reply("☎️ Введите новый номер:", reply_markup=return_to_menu)
+        await m.reply("📱️ Введите новый номер:", reply_markup=return_to_menu)
         await ChangeInfo.next()
     elif m.text == "✖️ Отмена":
         await state.finish()

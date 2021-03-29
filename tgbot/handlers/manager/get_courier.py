@@ -12,6 +12,7 @@ async def get_courier(m: Message, repo: Repo):
 
 Статус: {courier_data['status']}
 ФИО: {courier_data['name']}
+Город: {courier_data['city'].title()}
 Номер телефона: {courier_data['number']}
 
 

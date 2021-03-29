@@ -21,6 +21,7 @@ async def generate_order_data_message(order_data, courier_data=None, is_new: boo
     else:
         order_message += f"🚩 Заказ №{order_data['orderid']} | <b>Частное лицо</b>\n"
 
+    order_message += f"🏙️ Город: <code>{order_data['city'].title()}</code>\n"
     order_message += f"⏳ Статус: <code>{order_data['status']}</code>\n"
 
     if courier_data is None:
@@ -92,7 +93,8 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
         await call.bot.send_message(chat_id=order_data['customerid'],
                                     text=f"🚩 Статус заказа №{order_id} обновлен!\n"
                                          f"⏳ Статус: <i>{order_data['status']}</i>")
-        await call.bot.send_message(chat_id=config.tg_bot.orders_group,
+        city_data = await repo.get_partner(city=order_data['city'])
+        await call.bot.send_message(chat_id=city_data['ordersgroupid'],
                                     text=f"🚩 Статус заказа №{order_id} обновлен!\n"
                                          f"⏳ Статус: <i>{order_data['status']}</i>")
         if order_data['courierid'] is not None and call.message.chat.id not in couriers_list:
@@ -105,7 +107,9 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
 # change order courier
 async def list_of_available_couriers(call: CallbackQuery, callback_data: dict, repo: Repo):
     await call.answer(text="Выберите курьера из выпадающего списка")
-    available_couriers = await repo.get_available_couriers_list()
+    order_id = callback_data['order_id']
+    order = await repo.get_order(order_id=order_id)
+    available_couriers = await repo.get_available_couriers_list(city=order['city'])
     await call.message.edit_reply_markup(
         reply_markup=await get_couriers_keyboard(array=available_couriers, order_id=callback_data['order_id']))
     await call.answer()

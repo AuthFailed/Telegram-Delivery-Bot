@@ -3,14 +3,14 @@ from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 
 from tgbot.config import load_config
 from tgbot.handlers.manager.order_interaction import generate_order_data_message
-from tgbot.keyboards.default.user.check_order import check_order
-from tgbot.keyboards.default.user.choose_time import choose_time
-from tgbot.keyboards.default.user.main_menu import main_menu
-from tgbot.keyboards.default.user.return_to_menu import return_to_menu
+from tgbot.keyboards.default.customer.check_order import check_order
+from tgbot.keyboards.default.customer.choose_time import choose_time
+from tgbot.keyboards.default.customer.main_menu import main_menu
+from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
 from tgbot.keyboards.inline.customer.aiogramcalendar import create_calendar, process_calendar_selection
 from tgbot.keyboards.inline.manager.order import order_keyboard
 from tgbot.services.repository import Repo
-from tgbot.states.user.order import Order
+from tgbot.states.customer.order import Order
 
 
 async def order_starts(m: Message, repo: Repo):
@@ -123,8 +123,8 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
 
 📥 Получатель:
 ФИО: <code>{order_data['order_name']}</code>
-Номер: <code>{order_data['order_number']}</code>
-Адрес: {order_data['order_address']}
+Адрес: <code>{order_data['order_address']}</code>
+Номер: {order_data['order_number']}
 
 📦 О заказе:
 Дата и время доставки: <code>{order_datetime}</code>
@@ -144,6 +144,7 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
             order_datetime = order_data['order_datetime']
 
         order_id = await repo.add_order(
+            city=customer_data['city'],
             customer_id=m.chat.id,
             customer_type=customer_data["usertype"],
             customer_name=customer_data["name"],
@@ -157,8 +158,8 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         )
 
         order_data = await repo.get_order(order_id=order_id)
-        config = load_config("bot.ini")
-        await m.bot.send_message(chat_id=config.tg_bot.orders_group,
+        city_info = await repo.get_partner(city=customer_data['city'])
+        await m.bot.send_message(chat_id=city_info['ordersgroupid'],
                                  text=await generate_order_data_message(order_data=order_data,
                                                                         is_new=True),
                                  reply_markup=await order_keyboard(order_id=order_id))
@@ -177,9 +178,11 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         customer_type = customer['usertype']
 
         if customer_type == "Частное лицо":
-            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес " \
+                             "получателя: "
         else:
-            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес " \
+                             "получателя\nДату и время доставки: "
         await m.answer(
             text=answer_message,
             reply_markup=return_to_menu,

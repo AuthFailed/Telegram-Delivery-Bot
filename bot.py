@@ -50,7 +50,7 @@ async def main():
     bot = Bot(token=config.tg_bot.token, parse_mode='html')
     dp = Dispatcher(bot, storage=storage)
     dp.middleware.setup(DbMiddleware(pool))
-    dp.middleware.setup(RoleMiddleware(admin_id=config.tg_bot.admin_id))
+    dp.middleware.setup(RoleMiddleware())
     dp.middleware.setup(SupportMiddleware(Dispatcher=dp))
     dp.filters_factory.bind(RoleFilter)
     dp.filters_factory.bind(AdminFilter)
@@ -64,7 +64,6 @@ async def main():
     # register apscheduler
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduler.start()
-    # scheduler.add_job(send_stats, 'interval', args=(bot, True, repository.Repo(pool)), seconds=10)
     scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), hour=23, minute=0,
                       replace_existing=True)  # Day stats
     scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), day_of_week='Sun', hour=23, minute=0,

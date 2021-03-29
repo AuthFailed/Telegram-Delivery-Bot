@@ -1,5 +1,6 @@
 from aiogram.utils.callback_data import CallbackData
 
+registration_city = CallbackData("reg_city", "city_name")
 choose_order = CallbackData("order", "order_id")
 calendar_callback = CallbackData('calendar', 'act', 'year', 'month', 'day')
 

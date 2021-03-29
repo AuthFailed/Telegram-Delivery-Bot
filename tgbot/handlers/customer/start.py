@@ -1,7 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
-from tgbot.keyboards.default.user.main_menu import main_menu
+from tgbot.keyboards.default.customer.main_menu import main_menu
 from tgbot.services.repository import Repo
 
 

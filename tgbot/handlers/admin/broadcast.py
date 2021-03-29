@@ -8,10 +8,11 @@ from tgbot.services.repository import Repo
 from tgbot.states.admin.post import Post
 
 
-async def broadcast_start(m: Message):
+async def broadcast_start(m: Message, repo: Repo):
     await m.reply(text="""📜 <b>Введите рассылаемый текст:</b>
 
-<i>Подсказка: Текст поддерживает форматирование.""",
+<i>Подсказка: Текст поддерживает форматирование.
+На данный момент поддерживается рассылка только заказчикам.</i>""",
                   reply_markup=return_to_menu,
                   disable_web_page_preview=True)
     await Post.first()
@@ -34,7 +35,8 @@ async def broadcast_image(m: Message, state: FSMContext):
 
 async def broadcast_choice(m: Message, repo: Repo, state: FSMContext):
     if m.text == "✉️ Отправить":
-        customers_list = await repo.get_customers_list()
+        city_info = await repo.get_partner(admin_id=m.chat.id)
+        customers_list = await repo.get_customers_list(city_name=city_info['city'])
         broadcast_data = await state.get_data()
         i = 0
         for customer in customers_list:

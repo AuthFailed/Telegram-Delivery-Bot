@@ -1,7 +1,10 @@
 [tg_bot]
-token = 
-admin_id =
+token =
 use_redis = true
+orders_group =
+couriers_group =
+events_group =
+city_name =
 
 [db]
 user = postgres

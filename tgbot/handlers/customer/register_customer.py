@@ -12,11 +12,12 @@ from tgbot.handlers.customer.price_map import price_map
 from tgbot.handlers.customer.registration import *
 from tgbot.handlers.customer.start import *
 from tgbot.handlers.customer.tech_support import *
-from tgbot.keyboards.inline.customer.callback_data import calendar_callback, pagination_call, show_item_data
+from tgbot.keyboards.inline.customer.callback_data import calendar_callback, pagination_call, show_item_data, \
+    registration_city
 from tgbot.models.role import UserRole
-from tgbot.states.user.change_info import ChangeInfo
-from tgbot.states.user.delete_profile import DeleteAccount
-from tgbot.states.user.order import Order
+from tgbot.states.customer.change_info import ChangeInfo
+from tgbot.states.customer.delete_profile import DeleteAccount
+from tgbot.states.customer.order import Order
 
 
 def register_customer(dp: Dispatcher):
@@ -33,9 +34,10 @@ def register_customer(dp: Dispatcher):
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationUser.name,
                                 chat_type=ChatType.PRIVATE)
+    dp.register_callback_query_handler(reg_city, registration_city.filter(), state=RegistrationUser.city)
     dp.register_message_handler(reg_address, content_types=['text'], state=RegistrationUser.address,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(reg_number, content_types=['text'], state=RegistrationUser.number,
+    dp.register_message_handler(reg_number, content_types=['text', 'contact'], state=RegistrationUser.number,
                                 chat_type=ChatType.PRIVATE)
 
     # new order

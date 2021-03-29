@@ -1,6 +1,6 @@
 from aiogram.types import Message
 
-from tgbot.keyboards.default.user.personal_profile import personal_profile_kb
+from tgbot.keyboards.default.customer.personal_profile import personal_profile_kb
 from tgbot.services.repository import Repo
 
 
@@ -14,6 +14,7 @@ async def personal_profile(m: Message, repo: Repo):
 👨 <b>Общая информация</b>:
 Тип аккаунта: <code>{user_data['usertype']}</code>
 Лицо: <code>{user_data['name']}</code>
+Город: <code>{user_data['city'].title()}</code>
 Адрес: <code>{user_data['address']}</code>
 Номер: {user_data['number']}
 

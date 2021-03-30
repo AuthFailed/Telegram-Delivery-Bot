@@ -1,5 +1,4 @@
 # CRM-система курьерской службы
-[![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://GitHub.com/AuthFailed/Telegram-Delivery-Bot/issues/)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![time tracker](https://wakatime.com/badge/github/AuthFailed/Telegram-Delivery-Bot.svg)](https://wakatime.com/badge/github/AuthFailed/Telegram-Delivery-Bot)
 

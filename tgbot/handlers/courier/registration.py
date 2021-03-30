@@ -2,7 +2,6 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from tgbot.config import load_config
 from tgbot.keyboards.default.courier.main_menu import main_menu
 from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
 from tgbot.keyboards.inline.customer.cities import cities
@@ -77,7 +76,6 @@ async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
     await m.answer(text="👋 Вы зарегистрировались.\nС вами свяжется менеджер для проверки данных!")
     await m.answer(text="Главное меню", reply_markup=main_menu)
 
-    config = load_config("bot.ini")
     media = types.MediaGroup()
     media.attach_photo(courier_db_data[0]['passportmain'])
     media.attach_photo(courier_db_data[0]['passportregistration'])

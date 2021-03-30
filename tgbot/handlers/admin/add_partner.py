@@ -16,7 +16,7 @@ async def add_partner(m: Message, repo: Repo):
                        reply_markup=return_to_menu)
         await NewPartner.first()
     else:
-        await m.answer(text="У вас нет доступа к функционалу <b>главного администратора</b>!")
+        await m.answer(text="У Вас нет доступа к функционалу <b>главного администратора</b>!")
 
 
 async def partner_city(m: Message, repo: Repo, state: FSMContext):
@@ -48,7 +48,7 @@ async def partner_id(m: Message, repo: Repo, state: FSMContext):
         await m.answer(text=f"""Проверьте введённые данные:
 👑 ID администратора: <b>{partner_data['admin_id']}</b>
 🏙 Город: <b>{partner_data['city'].title()}</b>
-    """,
+""",
                        reply_markup=check_partner)
         await NewPartner.next()
     else:
@@ -61,10 +61,17 @@ async def partner_choice(m: Message, repo: Repo, state: FSMContext):
         await repo.add_partner(partner_id=partner_data['admin_id'],
                                city=partner_data['city'])
         await state.finish()
+        await m.bot.send_message(chat_id=partner_data['admin_id'], text=f"""
+Здравствуйте, Вы назначены <b>администратором города {partner_data['city'].title()}!</b>
+Используйте команду /start для обновления данных. 
+
+<i>Вам необходимо будет провести <b>простую настройку бота</b> перед началом работы.</i>""")
         await m.answer(text=f"""Вы успешно добавили нового партнера!
-Подключенный город - <b>{partner_data['city'].title()}</b>.
-Администратором назначен ID <b>{partner_data['admin_id']}</b>.
-Отправьте партнеру (<a href="https://t.me/dostavka30rus_bot">ссылку на бота</a>) и попросите активировать его.""",
+        
+🏙 Подключенный город: <b>{partner_data['city'].title()}</b>.
+👑 Администратор: <a href="tg://user?id={partner_data['admin_id']}">Ссылка на профиль</a> 
+
+Партнер уже получил уведомление о своем назначении.""",
                        reply_markup=ReplyKeyboardRemove())
         await manage_bot(m, repo)
     elif m.text == "🔄 Заполнить заново":
@@ -73,4 +80,4 @@ async def partner_choice(m: Message, repo: Repo, state: FSMContext):
         await NewPartner.first()
 
     elif m.text == "🏠 Вернуться в меню":
-        await start(m=m)
+        await start(m, repo, state)

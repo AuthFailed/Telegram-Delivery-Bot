@@ -3,6 +3,7 @@ from aiogram.types import ChatType
 
 from tgbot.handlers.customer.change_profile_data import change_user_data, user_choice, new_info
 from tgbot.handlers.customer.delete_profile import delete_profile, delete_profile_yes, delete_profile_no
+from tgbot.handlers.customer.get_id import get_my_id
 from tgbot.handlers.customer.order import order_starts, order_all_info, order_time, order_other_details, \
     order_user_choice, order_date
 from tgbot.handlers.customer.orders_interaction import list_of_available_orders, show_chosen_page, show_item
@@ -92,3 +93,5 @@ def register_customer(dp: Dispatcher):
     # our services
     dp.register_message_handler(our_services, text="🚀 Наши услуги", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
+
+    dp.register_message_handler(get_my_id, commands=['id'], role=[UserRole.USER, UserRole.COURIER, UserRole.MANAGER, UserRole.ADMIN])

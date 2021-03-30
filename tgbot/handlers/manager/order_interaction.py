@@ -74,7 +74,6 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
                                          reply_markup=await courier_order_keyboard_kb(order_id=order_id))
 
     else:
-        config = load_config("bot.ini")
         await repo.change_order_status(order_id=order_id, order_status=order_status)
         order_data = await repo.get_order(order_id=order_id)
         courier_id = order_data['courierid']

@@ -10,7 +10,7 @@ class RoleMiddleware(LifetimeControllerMiddleware):
 
     async def pre_process(self, obj, data, *args):
         repo = data['repo']
-        admins_list = [partner["adminid"] for partner in await repo.get_partners()]
+        admins_list = [partner["adminid"] for partner in await repo.get_partners(with_main=True)]
         couriers_list = [courier['userid'] for courier in await repo.get_couriers_list()]
         managers_list = [manager['userid'] for manager in await repo.get_managers_list()]
         if not hasattr(obj, "from_user"):

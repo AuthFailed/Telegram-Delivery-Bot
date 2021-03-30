@@ -1,25 +1,32 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.keyboards.inline.customer.callback_data import show_item_data, pagination_call
+from tgbot.keyboards.inline.customer.callback_data import show_item_data, pagination_call, show_partner_data
 
 
-async def get_pages_keyboard(array, page: int = 1):
+async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
     markup = InlineKeyboardMarkup(row_width=1)
-    key = "items"
 
-    MAX_ITEMS_PER_PAGE = 4
+    MAX_ITEMS_PER_PAGE = 5
     first_item_index = (page - 1) * MAX_ITEMS_PER_PAGE
     last_item_index = page * MAX_ITEMS_PER_PAGE
 
     sliced_array = array[first_item_index:last_item_index]
     item_buttons = list()
 
-    for item in sliced_array:
-        item_buttons.append(
-            InlineKeyboardButton(
-                text=f'№{item["orderid"]} | ⏳ {item["status"]}',
-                callback_data=show_item_data.new(item_id=item['orderid'])
-            ))
+    if key == "partners":
+        for item in sliced_array:
+            item_buttons.append(
+                InlineKeyboardButton(
+                    text=f'№{item["id"]} | {item["city"].title()} | {"✅️" if item["isworking"] else "❌"}',
+                    callback_data=show_partner_data.new(partner_id=item['adminid'])
+                ))
+    else:
+        for item in sliced_array:
+            item_buttons.append(
+                InlineKeyboardButton(
+                    text=f'№{item["orderid"]} | ⏳ {item["status"]}',
+                    callback_data=show_item_data.new(item_id=item['orderid'])
+                ))
 
     pages_buttons = list()
     first_page = 1
@@ -91,6 +98,14 @@ async def get_pages_keyboard(array, page: int = 1):
 
     for button in item_buttons:
         markup.insert(button)
+
+    if key == "partners":
+        markup.add(
+            InlineKeyboardButton(
+                text="👨 Добавить партнера",
+                callback_data=show_partner_data.new(partner_id="add")
+            )
+        )
 
     markup.row(*pages_buttons)
     return markup

@@ -2,11 +2,9 @@ from datetime import datetime
 
 from aiogram.types import Message
 
-from tgbot.config import load_config
 from tgbot.services.repository import Repo
 
-config = load_config("bot.ini")
-events_chat = config.tg_bot.events_group
+events_chat = ""
 now = datetime.now()
 
 

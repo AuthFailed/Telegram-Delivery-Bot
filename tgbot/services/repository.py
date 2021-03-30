@@ -12,6 +12,12 @@ class Repo:
         await self.conn.execute("""
 INSERT INTO partners (city, adminid) VALUES (\'{0}\', {1})""".format(city, partner_id))
 
+    async def change_partner_status(self, partner_id: int, status: bool):
+        if status is True:
+            await self.conn.execute("""UPDATE partners SET isworking = True WHERE adminid = {0}""".format(partner_id))
+        else:
+            await self.conn.execute("""UPDATE partners SET isworking = False WHERE adminid = {0}""".format(partner_id))
+
     async def set_group_id(self, group: str, group_id: int, city: str):
         await self.conn.execute("""
 UPDATE partners SET {0} = {1} WHERE city = \'{2}\'""".format(group, group_id, city)
@@ -45,12 +51,13 @@ SELECT * FROM partners WHERE adminid = \'{0}\'""".format(admin_id))
 SELECT * FROM partners WHERE city = \'{0}\'""".format(city))
         return result
 
-    async def get_partners(self):
+    async def get_partners(self, with_main: bool = False):
         """Get all available cities"""
-        result = await self.conn.fetch(
-            """SELECT * FROM partners"""
-        )
-        return result
+        execute_request = "SELECT * FROM partners"
+        if with_main is False:
+            execute_request += " WHERE ismain = False"
+        rows = await self.conn.fetch(execute_request)
+        return rows
 
     async def get_available_cities(self):
         result = await self.conn.fetch(
@@ -58,9 +65,13 @@ SELECT * FROM partners WHERE city = \'{0}\'""".format(city))
         )
         return result
 
-    async def delete_partner(self, city_name: int):
-        await self.conn.execute("""
-        DELETE FROM partners WHERE city = \'{0}\'""".format(city_name))
+    async def delete_partner(self, city: str = None, admin_id: str = None):
+        if city is None:
+            await self.conn.execute("""
+DELETE FROM partners WHERE adminid = {0}""".format(admin_id))
+        else:
+            await self.conn.execute("""
+            DELETE FROM partners WHERE city = \'{0}\'""".format(city))
 
     # managers
     async def add_manager(self, user_id: int, name: str, city: str, number: str):

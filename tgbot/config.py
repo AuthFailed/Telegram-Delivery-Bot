@@ -15,9 +15,6 @@ class TgBot:
     token: str
     use_redis: bool
     use_db: bool
-    orders_group: str
-    couriers_group: str
-    events_group: str
 
 
 @dataclass
@@ -42,10 +39,7 @@ def load_config(path: str):
         tg_bot=TgBot(
             token=tg_bot["token"],
             use_redis=cast_bool(tg_bot.get("use_redis")),
-            use_db=cast_bool(tg_bot.get("use_db")),
-            orders_group=tg_bot["orders_group"],
-            couriers_group=tg_bot["couriers_group"],
-            events_group=tg_bot["events_group"],
+            use_db=cast_bool(tg_bot.get("use_db"))
         ),
         db=DbConfig(**config["db"])
     )

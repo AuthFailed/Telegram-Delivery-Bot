@@ -7,3 +7,5 @@ calendar_callback = CallbackData('calendar', 'act', 'year', 'month', 'day')
 pagination_call = CallbackData("paginator", "key", "page")
 show_item_data = CallbackData("show_item", "item_id")
 show_courier_data = CallbackData("show_courier", "courier_id")
+
+show_partner_data = CallbackData("show_partner", "partner_id")

@@ -3,22 +3,20 @@ import random
 from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.config import load_config
 from tgbot.keyboards.inline.manager.callback_data import support_callback, cancel_support_callback
+from tgbot.services.repository import Repo
 
 
 async def check_support_available(support_id, state: FSMContext):
     state = await state.storage.get_data(chat=support_id, user=support_id)
-    # state_str =
     if str(state) == "in_support":
         return
     else:
         return support_id
 
 
-async def get_support_manager(state: FSMContext):
-    config = load_config("bot.ini")
-    support_ids = config.tg_bot.managers
+async def get_support_manager(state: FSMContext, repo: Repo, city: str):
+    support_ids = await repo.get_managers_list(city=city)
     random.shuffle(support_ids)
     for support_id in support_ids:
         # Проверим если оператор в данное время не занят
@@ -31,19 +29,20 @@ async def get_support_manager(state: FSMContext):
         return
 
 
-async def support_keyboard(messages, state: FSMContext, user_id=None):
+async def support_keyboard(messages, repo: Repo, city: str, state: FSMContext, user_id=None):
     if user_id:
-        # Есле указан второй айдишник - значит эта кнопка для оператора
+        # Если указан второй айдишник - значит эта кнопка для оператора
 
         contact_id = int(user_id)
         as_user = "no"
         text = "Ответить пользователю"
 
     else:
-        # Есле не указан второй айдишник - значит эта кнопка для пользователя
+        # Если не указан второй айдишник - значит эта кнопка для пользователя
         # и нужно подобрать для него оператора
 
-        contact_id = await get_support_manager(state=state)
+        manager_data = await get_support_manager(state=state, repo=repo, city=city)
+        contact_id = manager_data['userid']
         as_user = "yes"
         if messages == "many" and contact_id is None:
             # Если не нашли свободного оператора - выходим и говорим, что его нет

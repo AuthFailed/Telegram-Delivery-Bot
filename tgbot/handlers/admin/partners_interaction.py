@@ -22,10 +22,10 @@ async def generate_partner_data_message(partner_data, m: Message):
         partner_data['couriersgroupid'] is not None else "Не настроены"
     events_group = await m.bot.create_chat_invite_link(chat_id=partner_data['eventsgroupid']) if \
         partner_data['eventsgroupid'] is not None else "Не настроены"
-    message_to_send = f"""<b>Партнер № {partner_data['id']}</b>
+    message_to_send = f"""<b>Партнер №{partner_data['id']}</b>
 
 👨 <b>Общая информация</b>:
-Город: <code>{partner_data['city']}</code>
+Город: <code>{partner_data['city'].title()}</code>
 Администратор: <a href="tg://user?id={partner_data['adminid']}">Ссылка на профиль</a> 
 
 💬 <b>Чаты:</b>
@@ -98,7 +98,6 @@ async def partner_choice(m: Message, repo: Repo, state: FSMContext):
                        reply_markup=ReplyKeyboardRemove())
 
         partner_data = await repo.get_partner(city=partner_data['city'])
-        print(partner_data)
         await m.answer(text=await generate_partner_data_message(partner_data=partner_data, m=m))
 
         await manage_bot(m, repo)
@@ -118,7 +117,7 @@ async def list_of_available_partners(m: Message, repo: Repo):
                    reply_markup=await get_pages_keyboard(key="partners", array=partners_list))
 
 
-async def show_chosen_page(c: CallbackQuery, callback_data: dict, repo: Repo):
+async def show_chosen_page_partners(c: CallbackQuery, callback_data: dict, repo: Repo):
     partners_list = await repo.get_partners()
     current_page = int(callback_data.get("page"))
 
@@ -159,19 +158,21 @@ async def partner_action(c: CallbackQuery, callback_data: dict, repo: Repo):
         partner_data = await repo.get_partner(admin_id=callback_data['partner_id'])
         await repo.delete_partner(admin_id=callback_data['partner_id'])
         await c.answer(text="Партнер удален")
+        await c.bot.send_message(chat_id=partner_data['adminid'],
+                                 text="<b>Ваш город удален, с вам сняты права администратора.</b>\n\n"
+                                      "<i>Если у вас есть вопросы, пожалуйста, обратитесь в тех. поддержку.</i>")
         await c.message.edit_text(f"""
 <b>Партнер №{partner_data['id']} удален </b>
 
 👨 <b>Общая информация</b>:
-Город: <code>{partner_data['city']}</code>
-Администратор: <a href="tg://user?id={partner_data['adminid']}">Ссылка на профиль</a>""")
+Город: <code>{partner_data['city'].title()}</code>
+Администратор: <a href="tg://user?id={partner_data['adminid']}">Ссылка на профиль</a>
+
+Партнер получил уведомление о том, что он был удален.""")
 
         await list_of_available_partners(m=c.message, repo=repo)
     elif action == "to_partners":
         await c.answer()
         partners_list = await repo.get_partners()
-        if len(partners_list) > 0:
-            await c.message.edit_text(text="🤝 Партнеры:",
-                                      reply_markup=await get_pages_keyboard(key="partners", array=partners_list))
-        else:
-            await c.message.edit_text(text="Вы не добавили ни одного партнера.")
+        await c.message.edit_text(text="🤝 Партнеры:",
+                                  reply_markup=await get_pages_keyboard(key="partners", array=partners_list))

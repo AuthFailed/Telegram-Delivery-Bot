@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from tgbot.keyboards.inline.customer.callback_data import show_item_data, pagination_call, show_partner_data
+from tgbot.keyboards.inline.customer.callback_data import show_item_data, pagination_call, show_partner_data, \
+    show_manager_data
 
 
 async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
@@ -20,13 +21,21 @@ async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
                     text=f'№{item["id"]} | {item["city"].title()} | {"✅️" if item["isworking"] else "❌"}',
                     callback_data=show_partner_data.new(partner_id=item['adminid'])
                 ))
-    else:
+    elif key == "managers":
+        for item in sliced_array:
+            item_buttons.append(
+                InlineKeyboardButton(
+                    text=f'№{item["id"]} | {item["name"]}',
+                    callback_data=show_manager_data.new(manager_id=item['userid'])
+                ))
+    elif key == "items":
         for item in sliced_array:
             item_buttons.append(
                 InlineKeyboardButton(
                     text=f'№{item["orderid"]} | ⏳ {item["status"]}',
                     callback_data=show_item_data.new(item_id=item['orderid'])
                 ))
+
 
     pages_buttons = list()
     first_page = 1
@@ -104,6 +113,13 @@ async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
             InlineKeyboardButton(
                 text="👨 Добавить партнера",
                 callback_data=show_partner_data.new(partner_id="add")
+            )
+        )
+    elif key == "managers":
+        markup.add(
+            InlineKeyboardButton(
+                text="👨‍💼 Добавить менеджера",
+                callback_data=show_manager_data.new(manager_id="add")
             )
         )
 

@@ -64,7 +64,7 @@ async def new_courier(m: Message, courier_data):
 
 <b>👨‍💻 Данные аккаунта:</b>
 Имя: {courier_data['name']}
-Город: {courier_data['city']}
+Город: {courier_data['city'].title()}
 Номер телефона: {courier_data['number']}
 
 <i>Дата: {now.hour}:{now.minute} {now.day}.{now.month}.{now.year}</i>"""

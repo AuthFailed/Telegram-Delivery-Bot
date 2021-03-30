@@ -1,6 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
+from tgbot.handlers.customer.start import start
 from tgbot.keyboards.default.customer.main_menu import main_menu as user_main_menu
 from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
 from tgbot.keyboards.default.customer.send_number import ask_phone_number
@@ -47,10 +48,13 @@ async def reg_name(m: Message, repo: Repo, state: FSMContext):
             data['name'] = m.text
 
         cities_list = await repo.get_available_cities()
-
-        await m.reply(text="📬 Выберите ваш город из списка",
-                      reply_markup=await cities(cities_list=cities_list))
-        await RegistrationUser.next()
+        if len(cities_list) > 0:
+            await m.reply(text="📬 Выберите ваш город из списка",
+                          reply_markup=await cities(cities_list=cities_list))
+            await RegistrationUser.next()
+        else:
+            await m.answer(text="В данный момент ни один город не активен. Регистрация будет сброшена.")
+            await start(m, repo, state)
 
 
 async def reg_city(c: CallbackQuery, callback_data: dict, repo: Repo, state: FSMContext):

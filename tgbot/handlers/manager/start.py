@@ -1,5 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardRemove
 
 from tgbot.services.repository import Repo
 
@@ -9,7 +9,8 @@ async def start(m: Message, repo: Repo, state: FSMContext = None):
         await state.finish()
 
     await m.answer(text=f"Привет, <b>менеджер</b>!\n"
-                        f"У тебя пока нет личного меню, но есть пара команд: /заказчик, /заказ и /курьер")
+                        f"У тебя пока нет личного меню, но есть пара команд: /заказчик, /заказ и /курьер",
+                   reply_markup=ReplyKeyboardRemove())
     manager_data = await repo.get_manager(manager_id=m.chat.id)
     city_data = await repo.get_partner(city=manager_data['city'])
 

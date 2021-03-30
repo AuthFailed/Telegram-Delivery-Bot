@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
+from tgbot.handlers.courier.start import start
 from tgbot.keyboards.default.courier.main_menu import main_menu
 from tgbot.keyboards.default.customer.return_to_menu import return_to_menu
 from tgbot.keyboards.inline.customer.cities import cities
@@ -15,9 +16,13 @@ async def reg_name(m: Message, repo: Repo, state: FSMContext):
     await state.update_data(name=m.text)
 
     cities_list = await repo.get_available_cities()
-    await m.reply(text="📬 Выберите ваш город из списка",
-                  reply_markup=await cities(cities_list=cities_list))
-    await RegistrationCourier.next()
+    if len(cities_list) > 0:
+        await m.reply(text="📬 Выберите ваш город из списка",
+                      reply_markup=await cities(cities_list=cities_list))
+        await RegistrationCourier.next()
+    else:
+        await m.answer(text="В данный момент ни один город не активен. Регистрация будет сброшена.")
+        await start(m, state)
 
 
 async def reg_city(c: CallbackQuery, callback_data: dict, state: FSMContext):
@@ -86,7 +91,7 @@ async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
 
 👨 Данные:
 ФИО: <code>{courier_data['name']}</code>
-Город: <code>{courier_data['city']}</code>
+Город: <code>{courier_data['city'].title()}</code>
 Номер: {courier_data['number']}
 
 ⏳ Статус заявки:

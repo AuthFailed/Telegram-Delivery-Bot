@@ -74,23 +74,28 @@ DELETE FROM partners WHERE adminid = {0}""".format(admin_id))
             DELETE FROM partners WHERE city = \'{0}\'""".format(city))
 
     # managers
-    async def add_manager(self, user_id: int, name: str, city: str, number: str):
-        result = await self.conn.fetchval("""
+    async def add_manager(self, manager_id: int, name: str, city: str, number: str):
+        await self.conn.execute("""
 INSERT INTO managers (userid, name, city, number)
-VALUES ({0}, {1}, {2}, {3})
-ON CONFLICT DO NOTHING
-RETURNING id
-""".format(user_id, name, city, number))
-        return result
+VALUES ({0}, \'{1}\', \'{2}\', \'{3}\')""".format(manager_id, name, city, number))
 
-    async def get_manager(self, manager_id: int):
+    async def get_manager(self, manager_id):
         result = await self.conn.fetchrow("""
 SELECT * FROM managers WHERE userid={0}""".format(manager_id))
         return result
 
-    async def delete_manager(self, user_id):
+    async def is_manager_exists(self, manager_id):
+        result = await self.conn.fetchval("""
+SELECT EXISTS(
+SELECT 1
+FROM managers
+WHERE userid={0})
+""".format(manager_id))
+        return result
+
+    async def delete_manager(self, manager_id):
         await self.conn.execute("""
-DELETE FROM managers WHERE userid = {0}""".format(user_id))
+DELETE FROM managers WHERE userid = {0}""".format(manager_id))
 
     async def get_managers_list(self, city: str = None):
         if city is None:

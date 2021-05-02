@@ -4,7 +4,7 @@ main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(
-                text="👨‍💻 Личный кабинет"
+                text="🧑‍💼 Личный кабинет"
             )
         ],
         [

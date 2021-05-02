@@ -11,7 +11,7 @@ async def start(m: Message, repo: Repo, state: FSMContext = None):
     await m.answer(text=f"Привет, <b>менеджер</b>!\n"
                         f"У тебя пока нет личного меню, но есть пара команд: /заказчик, /заказ и /курьер",
                    reply_markup=ReplyKeyboardRemove())
-    manager_data = await repo.get_manager(manager_id=m.chat.id)
+    manager_data = await repo.get_manager(userid=m.chat.id)
     city_data = await repo.get_partner(city=manager_data['city'])
 
     message_to_send = "Всю нужную для работы информацию ты найдешь в следующих чатах:\n"

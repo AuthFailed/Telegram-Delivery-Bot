@@ -1,7 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 
-from tgbot.config import load_config
 from tgbot.handlers.manager.order_interaction import generate_order_data_message
 from tgbot.keyboards.default.customer.check_order import check_order
 from tgbot.keyboards.default.customer.choose_time import choose_time
@@ -14,21 +13,26 @@ from tgbot.states.customer.order import Order
 
 
 async def order_starts(m: Message, repo: Repo):
-    is_user_exists = await repo.is_user_exists(user_id=m.chat.id)
+    is_customer_exists = await repo.is_customer_exists(user_id=m.chat.id)
 
-    if is_user_exists:
-        customer_data = await repo.get_customer(user_id=m.chat.id)
+    if is_customer_exists:
+        customer = await repo.get_customer(userid=m.chat.id)
+        partner = await repo.get_partner(city=customer['city'])
+        if partner['working'] is False:
+            await m.answer(text="<b>В данный момент мы не принимаем заказы. Извините за доставленные неудобства!</b>")
+            return
+        customer_data = await repo.get_customer(userid=m.chat.id)
         if customer_data['usertype'] == "Частное лицо":
-            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя"
         else:
-            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки:"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки"
         await m.reply(text=answer_message,
                       reply_markup=return_to_menu)
         await Order.first()
 
 
 async def order_all_info(m: Message, repo: Repo, state: FSMContext):
-    customer_data = await repo.get_customer(user_id=m.chat.id)
+    customer_data = await repo.get_customer(userid=m.chat.id)
     user_type = customer_data['usertype']
     await state.update_data(user_type=user_type)
 
@@ -106,7 +110,7 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
     async with state.proxy() as data:
         data['other_details'] = other_details
         order_data = data
-    customer_data = await repo.get_customer(user_id=m.chat.id)
+    customer_data = await repo.get_customer(userid=m.chat.id)
     if 'order_datetime' not in data:
         order_datetime = f"{data['order_time']} {data['order_date']}"
     else:
@@ -137,28 +141,29 @@ async def order_other_details(m: Message, repo: Repo, state: FSMContext):
 async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
     if m.text == "👌 Все правильно":
         order_data = await state.get_data()
-        customer_data = await repo.get_customer(user_id=m.chat.id)
+        customer_data = await repo.get_customer(userid=m.chat.id)
         if 'order_datetime' not in order_data:
             order_datetime = f"{order_data['order_time']} {order_data['order_date']}"
         else:
             order_datetime = order_data['order_datetime']
 
-        order_id = await repo.add_order(
-            city=customer_data['city'],
-            customer_id=m.chat.id,
-            customer_type=customer_data["usertype"],
-            customer_name=customer_data["name"],
-            customer_address=customer_data["address"],
-            customer_number=customer_data["number"],
-            order_name=order_data["order_name"],
-            order_address=order_data["order_address"],
-            order_number=order_data["order_number"],
-            order_time=order_datetime,
-            other_details=order_data["other_details"],
-        )
+        order_id = await repo.add_order(city=customer_data['city'], customer_userid=m.chat.id,
+                                        customer_type=customer_data["usertype"], customer_name=customer_data["name"],
+                                        customer_address=customer_data["address"],
+                                        customer_number=customer_data["number"], order_name=order_data["order_name"],
+                                        order_address=order_data["order_address"],
+                                        order_number=order_data["order_number"], order_time=order_datetime,
+                                        other_details=order_data["other_details"])
 
         order_data = await repo.get_order(order_id=order_id)
         city_info = await repo.get_partner(city=customer_data['city'])
+        if city_info['ordersgroupid'] is None:
+            await m.answer("Произошла ошибка, мы уже оповестили администратора.")
+            await m.bot.send_message(chat_id=city_info['adminid'], text=f"")
+            await state.finish()
+            await m.answer(text="Главное меню",
+                           reply_markup=await main_menu(reg=True))
+            return
         await m.bot.send_message(chat_id=city_info['ordersgroupid'],
                                  text=await generate_order_data_message(order_data=order_data,
                                                                         is_new=True),
@@ -174,7 +179,7 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
                        reply_markup=await main_menu(reg=True))
     elif m.text == "🔄 Заполнить заново":
         await state.reset_data()
-        customer = await repo.get_customer(user_id=m.chat.id)
+        customer = await repo.get_customer(userid=m.chat.id)
         customer_type = customer['usertype']
 
         if customer_type == "Частное лицо":

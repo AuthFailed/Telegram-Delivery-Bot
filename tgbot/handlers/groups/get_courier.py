@@ -14,7 +14,7 @@ async def get_courier(m: Message, repo: Repo):
 ФИО: {courier_data['name']}
 Номер телефона: {courier_data['number']}
 
-📦 Заказов взято: {len(await repo.get_couriers_orders(courier_id=int(args)))}"""
+📦 Заказов взято: {len(await repo.get_couriers_orders(userid=int(args)))}"""
             await m.reply(text=answer_message)
         except TypeError:
             await m.reply("<b>🔎 Курьера с таким номером не существует.</b>")

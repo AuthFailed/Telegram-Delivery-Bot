@@ -8,8 +8,9 @@ from tgbot.services.repository import Repo
 
 async def ask_support_call_callback(c: CallbackQuery, repo: Repo, state: FSMContext):
     text = "Хотите связаться с техподдержкой? Нажмите на кнопку ниже!"
-    customer_data = await repo.get_customer(user_id=c.message.chat.id)
-    keyboard = await support_keyboard(messages="many", state=state, user_id=c.message.chat.id, city=customer_data['city'], repo=repo)
+    customer_data = await repo.get_customer(userid=c.message.chat.id)
+    keyboard = await support_keyboard(messages="many", state=state, user_id=c.message.chat.id,
+                                      city=customer_data['city'], repo=repo)
     if not keyboard:
         await c.message.answer("К сожалению, сейчас нет свободных операторов. Попробуйте позже.")
         return
@@ -19,7 +20,7 @@ async def ask_support_call_callback(c: CallbackQuery, repo: Repo, state: FSMCont
 
 async def ask_support_call(m: Message, repo: Repo, state: FSMContext):
     text = "Хотите связаться с техподдержкой? Нажмите на кнопку ниже!"
-    courier_data = await repo.get_courier(courier_id=m.chat.id)
+    courier_data = await repo.get_courier(userid=m.chat.id)
     keyboard = await support_keyboard(messages="many", state=state, city=courier_data['city'], repo=repo)
     if not keyboard:
         await m.answer("К сожалению, сейчас нет свободных операторов. Попробуйте позже.")
@@ -31,7 +32,7 @@ async def send_to_support_call(c: CallbackQuery, state: FSMContext, callback_dat
     await c.message.edit_text("Вы обратились в техподдержку. Ждем ответа от оператора!")
 
     user_id = int(callback_data.get("user_id"))
-    courier_data = await repo.get_courier(courier_id=c.from_user.id)
+    courier_data = await repo.get_courier(userid=c.from_user.id)
     if not await check_support_available(user_id, state=state):
         support_id = await get_support_manager(state=state, repo=repo, city=courier_data['city'])
     else:
@@ -45,9 +46,10 @@ async def send_to_support_call(c: CallbackQuery, state: FSMContext, callback_dat
     await state.set_state("wait_in_support")
     await state.update_data(second_id=support_id)
 
-    keyboard = await support_keyboard(messages="many", user_id=c.from_user.id, state=state, city=courier_data['city'], repo=repo)
+    keyboard = await support_keyboard(messages="many", user_id=c.from_user.id, state=state, city=courier_data['city'],
+                                      repo=repo)
 
-    courier_data = await repo.get_courier(courier_id=c.from_user.id)
+    courier_data = await repo.get_courier(userid=c.from_user.id)
     await c.bot.send_message(support_id,
                              f"С вами хочет связаться курьер <b>№{courier_data['id']} {c.from_user.full_name}</b>",
                              reply_markup=keyboard
@@ -70,7 +72,7 @@ async def answer_support_call(c: CallbackQuery, state: FSMContext, callback_data
     keyboard = cancel_support(second_id)
     keyboard_second_user = cancel_support(c.from_user.id)
 
-    courier_data = await repo.get_courier(courier_id=second_id)
+    courier_data = await repo.get_courier(userid=second_id)
 
     await c.message.edit_text(f"Вы на связи с курьером <b>№{courier_data['id']} {courier_data['name']}</b>!\n"
                               "Чтобы завершить общение нажмите на кнопку в закрепленном сообщении.",

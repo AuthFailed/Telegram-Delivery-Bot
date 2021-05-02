@@ -1,7 +1,6 @@
 from aiogram.types import CallbackQuery
 from aiogram.utils.exceptions import MessageNotModified
 
-from tgbot.config import load_config
 from tgbot.keyboards.inline.courier.order import courier_order_keyboard_kb
 from tgbot.keyboards.inline.manager.choose_courier import get_couriers_keyboard
 from tgbot.keyboards.inline.manager.order import order_keyboard
@@ -13,13 +12,13 @@ async def generate_order_data_message(order_data, courier_data=None, is_new: boo
     order_message = ""
     customer_type = order_data['customertype']
     if is_new and customer_type == "Компания":
-        order_message += f"🚩 Новый заказ №{order_data['orderid']} | <b>Компания</b>\n"
+        order_message += f"🚩 Новый заказ №{order_data['id']} | <b>Компания</b>\n"
     elif is_new and customer_type == "Частное лицо":
-        order_message += f"🚩 Новый заказ №{order_data['orderid']} | <b>Частное лицо</b>\n"
+        order_message += f"🚩 Новый заказ №{order_data['id']} | <b>Частное лицо</b>\n"
     elif is_new is False and customer_type == "Компания":
-        order_message += f"🚩 Заказ №{order_data['orderid']} | <b>Компания</b>\n"
+        order_message += f"🚩 Заказ №{order_data['id']} | <b>Компания</b>\n"
     else:
-        order_message += f"🚩 Заказ №{order_data['orderid']} | <b>Частное лицо</b>\n"
+        order_message += f"🚩 Заказ №{order_data['id']} | <b>Частное лицо</b>\n"
 
     order_message += f"🏙️ Город: <code>{order_data['city'].title()}</code>\n"
     order_message += f"⏳ Статус: <code>{order_data['status']}</code>\n"
@@ -58,7 +57,7 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
     order_status = callback_data.get("status")
     couriers_list = [courier['userid'] for courier in await repo.get_couriers_list()]
     if order_status == "Вернуться":
-        order_data = await repo.get_order(order_id=order_id)
+        order_data = await repo.get_order(order_id=str(order_id))
         courier_id = order_data['courierid']
         if call.message.chat.id not in couriers_list:
             await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,
@@ -74,8 +73,8 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
                                          reply_markup=await courier_order_keyboard_kb(order_id=order_id))
 
     else:
-        await repo.change_order_status(order_id=order_id, order_status=order_status)
-        order_data = await repo.get_order(order_id=order_id)
+        await repo.change_order_status(order_id=str(order_id), order_status=order_status)
+        order_data = await repo.get_order(order_id=str(order_id))
         courier_id = order_data['courierid']
         if call.message.chat.id not in couriers_list:
             await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,
@@ -136,8 +135,8 @@ async def set_order_courier(call: CallbackQuery, callback_data: dict, repo: Repo
 
     else:
         choosed_courier_id = callback_data['courier_id']
-        courier_data = await repo.get_courier(courier_id=choosed_courier_id)
-        await repo.change_order_courier(order_id=order_id, courier_id=choosed_courier_id)
+        courier_data = await repo.get_courier(userid=choosed_courier_id)
+        await repo.change_order_courier(order_id=order_id, courier_userid=choosed_courier_id)
         if call.message.chat.id not in couriers_list:
             await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,
                                                                                 courier_data=await repo.get_courier(

@@ -3,10 +3,10 @@ from aiogram.types import ChatType, ContentTypes
 
 from tgbot.handlers.courier.change_status import ask_for_status, set_new_status
 from tgbot.handlers.courier.delete_profile import delete_profile, delete_profile_yes, delete_profile_no
-from tgbot.handlers.courier.orders_interaction import list_of_available_orders, show_chosen_page, show_item
+from tgbot.handlers.courier.orders_interaction import list_of_available_orders, show_item, show_chosen_page
 from tgbot.handlers.courier.personal_profile import personal_profile
 from tgbot.handlers.courier.registration import reg_name, reg_number, reg_passport_main, \
-    reg_passport_registration, reg_driving_license_front, reg_driving_license_back, reg_city
+    reg_passport_registration, reg_driving_license_front, reg_driving_license_back, set_city, show_chosen_page_city
 from tgbot.handlers.courier.start import start
 from tgbot.handlers.courier.support_call import ask_support_call, send_to_support_call, answer_support_call, \
     not_supported, exit_support, ask_support_call_callback
@@ -29,8 +29,10 @@ def register_courier(dp: Dispatcher):
     # reg courier
     dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationCourier.name,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_callback_query_handler(reg_city, registration_city.filter(), state=RegistrationCourier.city)
-    dp.register_message_handler(reg_number, content_types=['text'], state=RegistrationCourier.number,
+    dp.register_callback_query_handler(show_chosen_page_city, pagination_call.filter(key="cities"))
+    dp.register_callback_query_handler(set_city, registration_city.filter(), state="*")
+
+    dp.register_message_handler(reg_number, content_types=['text', 'contact'], state=RegistrationCourier.number,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(reg_passport_main, content_types=['photo'],
                                 state=RegistrationCourier.passport_main,
@@ -46,7 +48,7 @@ def register_courier(dp: Dispatcher):
                                 chat_type=ChatType.PRIVATE)
 
     # personal info
-    dp.register_message_handler(personal_profile, text="👨‍💻 Личный кабинет", role=UserRole.COURIER,
+    dp.register_message_handler(personal_profile, text="🧑‍💼 Личный кабинет", role=UserRole.COURIER,
                                 chat_type=ChatType.PRIVATE)
 
     # courier's orders

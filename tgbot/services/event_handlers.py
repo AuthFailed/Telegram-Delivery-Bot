@@ -1,10 +1,11 @@
 from datetime import datetime
 
+from aiogram.bot import bot
 from aiogram.types import Message
 
 from tgbot.services.repository import Repo
 
-events_chat = ""
+events_chat = "-590150488"
 now = datetime.now()
 
 
@@ -25,7 +26,7 @@ async def new_customer(m: Message, customer_data, customer_id: int):
 
 
 async def customer_changed_profile_data(m: Message, customer_id: int, customer_state_data, repo: Repo):
-    customer_db_data = await repo.get_customer(user_id=customer_id)
+    customer_db_data = await repo.get_customer(userid=str(customer_id))
     if customer_state_data['choice'] == "name":
         changed_type = "Лицо"
     elif customer_state_data['choice'] == "address":

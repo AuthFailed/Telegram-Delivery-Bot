@@ -15,15 +15,15 @@ async def ask_for_status(m: Message):
 
 async def set_new_status(m: Message, repo: Repo, state: FSMContext):
     if m.text == "🛵 Свободен":
-        await repo.set_courier_status(courier_id=m.chat.id, status="Свободен")
+        await repo.set_courier_status(userid=m.chat.id, status="Свободен")
         await state.finish()
         await personal_profile(m=m, repo=repo)
     elif m.text == "🛵❗️ Занят":
-        await repo.set_courier_status(courier_id=m.chat.id, status="Занят")
+        await repo.set_courier_status(userid=m.chat.id, status="Занят")
         await state.finish()
         await personal_profile(m=m, repo=repo)
     elif m.text == "📦 На заказе":
-        await repo.set_courier_status(courier_id=m.chat.id, status="На заказе")
+        await repo.set_courier_status(userid=m.chat.id, status="На заказе")
         await state.finish()
         await personal_profile(m=m, repo=repo)
     elif m.text == "✖️ Отмена":

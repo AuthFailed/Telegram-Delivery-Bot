@@ -3,7 +3,6 @@ from aiogram.types import Message, ReplyKeyboardRemove
 
 from tgbot.handlers.customer.personal_profile import personal_profile
 from tgbot.keyboards.default.customer.delete_profile import delete_profile_kb
-from tgbot.services.event_handlers import customer_delete_profile
 from tgbot.services.repository import Repo
 from tgbot.states.customer.delete_profile import DeleteAccount
 
@@ -15,9 +14,9 @@ async def delete_profile(m: Message):
 
 
 async def delete_profile_yes(m: Message, state: FSMContext, repo: Repo):
-    customer_data = await repo.get_customer(user_id=m.chat.id)
+    customer_data = await repo.get_customer(userid=m.chat.id)
     # await customer_delete_profile(m=m, customer_data=customer_data)
-    await repo.delete_customer(user_id=m.chat.id)
+    await repo.delete_customer(userid=m.chat.id)
     await m.reply(text="🔨 <b>Ваш аккаунт был удален!</b>\n"
                        "Для повторной регистрации используйте команду /start",
                   reply_markup=ReplyKeyboardRemove())

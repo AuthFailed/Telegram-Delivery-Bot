@@ -7,271 +7,491 @@ class Repo:
     def __init__(self, conn):
         self.conn = conn
 
+    # promocodes
+    async def add_promo(self, promo_name: str, promo_usages: int, promo_code: str = None):
+        """
+        Регистрация кода
+        @param promo_name: Символьное название промокода
+        @param promo_usages: Кол-во использований промокода
+        @param promo_code: Уникальный набор символов (если не указан - генерируется)
+        """
+        await self.conn.execute(f"""
+INSERT INTO promocodes (promo_name, promo_usages, promo_code) VALUES (\'{promo_name}\', {promo_usages}, \'{promo_code}\'""")
+
+    async def edit_promo(self, promo_code: str, column: str, data: str):
+        """
+        Редактирование промокода
+        @param promo_code: Уникальный набор символов
+        @param column: Редактируемый столбец
+        @param data: Новые данные
+        """
+        await self.conn.execute("""
+UPDATE promocodes SET {0} = \'{1}\' WHERE promo_code = \'{2}\'""".format(column, data, promo_code))
+
+    async def delete_promo(self, promo_code: str):
+        """
+        Удаление промокода.
+        @param promo_code: Уникальный набор символов
+        """
+        await self.conn.execute(f"""
+DELETE FROM promocodes WHERE promo_code = \'{promo_code}\'""")
+
     # partners
-    async def add_partner(self, partner_id: int, city: str):
+    async def add_partner(self, userid: int, city: str):
+        """
+        Добавление партнера
+        @param userid: Уникальный идентификатор Telegram
+        @param city: Город партнёра
+        """
         await self.conn.execute("""
-INSERT INTO partners (city, adminid) VALUES (\'{0}\', {1})""".format(city, partner_id))
+INSERT INTO partners (city, adminid) VALUES (\'{0}\', \'{1}\')""".format(city, userid))
 
-    async def change_partner_status(self, partner_id: int, status: bool):
+    async def change_partner_status(self, partner_userid: int, status: bool):
+        """
+        Изменение статуса партнера
+        @param partner_userid: Уникальный идентификатор Telegram
+        @param status: Устанавливаемый статус
+        @return:
+        """
         if status is True:
-            await self.conn.execute("""UPDATE partners SET isworking = True WHERE adminid = {0}""".format(partner_id))
+            await self.conn.execute(
+                """UPDATE partners SET working = True WHERE adminid = \'{0}\'""".format(partner_userid))
         else:
-            await self.conn.execute("""UPDATE partners SET isworking = False WHERE adminid = {0}""".format(partner_id))
+            await self.conn.execute(
+                """UPDATE partners SET working = False WHERE adminid = \'{0}\'""".format(partner_userid))
 
-    async def set_group_id(self, group: str, group_id: int, city: str):
+    async def set_group_id(self, group_type: str, group_id: int, city: str):
+        """
+        Установка id группы
+        @param group_type: Тип группы
+        @param group_id: Уникальный идентификатор Telegram
+        @param city: Город партнёра
+        @return:
+        """
         await self.conn.execute("""
-UPDATE partners SET {0} = {1} WHERE city = \'{2}\'""".format(group, group_id, city)
+UPDATE partners SET {0} = {1} WHERE city = \'{2}\'""".format(group_type, group_id, city)
                                 )
 
-    async def is_partner_exists(self, city: str = None, partner_id=None):
+    async def is_partner_exists(self, city: str = None, userid=None):
+        """
+        Существует ли партнёр
+        @param city: Город партнёра
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         if city is None:
             result = await self.conn.fetchval(
                 "SELECT EXISTS("
                 "SELECT 1 "
                 "FROM partners "
-                "WHERE adminid=$1)",
-                partner_id
+                "WHERE adminid='{0}')".format(userid)
             )
         else:
             result = await self.conn.fetchval(
                 "SELECT EXISTS("
                 "SELECT 1 "
                 "FROM partners "
-                "WHERE city=$1)",
-                city
+                "WHERE city='{0}')".format(city)
             )
         return result
 
-    async def get_partner(self, city: str = None, admin_id: str = None):
+    async def get_partner(self, city: str = None, userid: str = None):
+        """
+        Получить данные партнёра
+        @param city: Город партнёра
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         if city is None:
             result = await self.conn.fetchrow("""
-SELECT * FROM partners WHERE adminid = \'{0}\'""".format(admin_id))
+SELECT * FROM partners WHERE adminid = \'{0}\'""".format(userid))
         else:
             result = await self.conn.fetchrow("""
 SELECT * FROM partners WHERE city = \'{0}\'""".format(city))
         return result
 
     async def get_partners(self, with_main: bool = False):
-        """Get all available cities"""
+        """
+        Получить всех партнеров
+        @param with_main: С администратором?
+        @return: 
+        """
         execute_request = "SELECT * FROM partners"
         if with_main is False:
-            execute_request += " WHERE ismain = False"
+            execute_request += " WHERE main = False"
+        execute_request += " ORDER BY city"
         rows = await self.conn.fetch(execute_request)
         return rows
 
     async def get_available_cities(self):
+        """
+        Получить доступные (включенные) города
+        @return:
+        """
         result = await self.conn.fetch(
-            """SELECT * FROM partners WHERE isworking = True"""
+            """SELECT * FROM partners WHERE working = True ORDER BY city"""
         )
         return result
 
-    async def delete_partner(self, city: str = None, admin_id: str = None):
+    async def delete_partner(self, city: str = None, userid: str = None):
+        """
+        Удалить партнёра
+        @param city: Город партнёра
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         if city is None:
             await self.conn.execute("""
-DELETE FROM partners WHERE adminid = {0}""".format(admin_id))
+DELETE FROM partners WHERE adminid = \'{0}\'""".format(userid))
         else:
             await self.conn.execute("""
             DELETE FROM partners WHERE city = \'{0}\'""".format(city))
 
     # managers
-    async def add_manager(self, manager_id: int, name: str, city: str, number: str):
+    async def add_manager(self, userid: str, name: str, city: str, number: str):
+        """
+        Добавить менеджера
+        @param userid: Уникальный идентификатор Telegram
+        @param name: Фио менеджера
+        @param city: Город менеджера
+        @param number: Номер менеджера
+        @return:
+        """
         await self.conn.execute("""
-INSERT INTO managers (userid, name, city, number)
-VALUES ({0}, \'{1}\', \'{2}\', \'{3}\')""".format(manager_id, name, city, number))
+INSERT INTO managers (userid, city, name, number)
+VALUES (\'{0}\', \'{1}\', \'{2}\', \'{3}\')""".format(userid, city, name, number))
 
-    async def get_manager(self, manager_id):
+    async def get_manager(self, userid):
+        """
+        Получить данные менеджера
+        @param userid:
+        @return:
+        """
         result = await self.conn.fetchrow("""
-SELECT * FROM managers WHERE userid={0}""".format(manager_id))
+SELECT * FROM managers WHERE userid=\'{0}\'""".format(userid))
         return result
 
-    async def is_manager_exists(self, manager_id):
+    async def is_manager_exists(self, userid):
+        """
+        Проверка существует ли менеджер
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         result = await self.conn.fetchval("""
 SELECT EXISTS(
 SELECT 1
 FROM managers
-WHERE userid={0})
-""".format(manager_id))
+WHERE userid=\'{0}\')
+""".format(userid))
         return result
 
-    async def delete_manager(self, manager_id):
+    async def delete_manager(self, userid):
+        """
+        Удалить менеджера
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         await self.conn.execute("""
-DELETE FROM managers WHERE userid = {0}""".format(manager_id))
+DELETE FROM managers WHERE userid = \'{0}\'""".format(userid))
 
     async def get_managers_list(self, city: str = None):
+        """
+        Получить список менеджеров
+        @param city: Город менеджеров
+        @return:
+        """
         if city is None:
             result = await self.conn.fetch("""
-SELECT * FROM managers""")
+SELECT * FROM managers ORDER BY name""")
         else:
             result = await self.conn.fetch("""
-SELECT * FROM managers WHERE city=\'{0}\'""".format(city))
+SELECT * FROM managers WHERE city=\'{0}\' ORDER BY name""".format(city))
         return result
 
     # users
-    async def add_user(self, user_id: int, user_type: str, name: str, city: str, address: str, number: str) -> None:
-        """Store user in DB, ignore duplicates"""
-        result = await self.conn.fetchval(
-            "INSERT INTO customers (userid, usertype, name, city, address, number) "
-            "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\') "
-            "ON CONFLICT DO NOTHING "
-            "RETURNING id".format(user_id,
-                                  user_type,
-                                  name,
-                                  city,
-                                  address,
-                                  number),
-        )
+    async def add_customer(self, userid: str, user_type: str, name: str, city: str, address: str, number: str,
+                           referral=None) -> None:
+        """
+        Добавить заказчика
+        @param referral: Уникальный идентификатор Telegram пригласившего
+        @param userid: Уникальный идентификатор Telegram
+        @param user_type: Тип заказчика (Компания/Частное лицо)
+        @param name: Фио заказчика
+        @param city: Город заказчика
+        @param address: Адрес заказчика
+        @param number: Номер заказчика
+        @return:
+        """
+        if referral:
+            result = await self.conn.fetchval(
+                "INSERT INTO customers (userid, referal, usertype, name, city, address, number) "
+                "VALUES ({0}, {1}, \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\') "
+                "ON CONFLICT DO NOTHING "
+                "RETURNING id".format(userid,
+                                      referral,
+                                      user_type,
+                                      name,
+                                      city,
+                                      address,
+                                      number),
+            )
+        else:
+            result = await self.conn.fetchval(
+                "INSERT INTO customers (userid, usertype, name, city, address, number) "
+                "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\') "
+                "ON CONFLICT DO NOTHING "
+                "RETURNING id".format(userid,
+                                      user_type,
+                                      name,
+                                      city,
+                                      address,
+                                      number),
+            )
         return result
 
-    async def get_customer(self, user_id: int = None, id: int = None):
-        """Get full user data from DB"""
+    async def get_customer(self, userid: str = None, id: int = None):
+        """
+        Получить данные заказчика
+        @param userid: Уникальный идентификатор Telegram
+        @param id: Инкрементный id заказчика
+        @return:
+        """
         if id is None:
             result = await self.conn.fetchrow(
                 "SELECT * "
                 "FROM customers "
-                "WHERE userid = $1",
-                user_id
+                "WHERE userid = \'{0}\'".format(userid)
             )
         else:
             result = await self.conn.fetchrow(
                 "SELECT * "
                 "FROM customers "
-                "WHERE id = $1",
-                id
+                "WHERE id = \'{0}\'".format(id)
             )
         return result
 
-    async def change_user_column(self, user_id: int, column: str, data: str):
-        """Change user data in certain column"""
+    async def check_referrals(self, userid: int):
+        query = "SELECT chat_id FROM users WHERE referral=" \
+                "(SELECT id FROM users WHERE chat_id={0})".format(userid)
+        result = await self.conn.fetch(query)
+        return result
+
+    async def edit_customer_column(self, userid: int, column: str, data: str):
+        """
+        Редактирование данных заказчика
+        @param userid: Уникальный идентификатор Telegram
+        @param column: Редактируемый столбец
+        @param data: Новые данные
+        @return:
+        """
         await self.conn.execute(
             "UPDATE customers "
             "SET {0} = \'{1}\' "
-            "WHERE userid = {2}".format(column, data, user_id)
+            "WHERE userid = \'{2}\'".format(column, data, userid)
         )
 
-    async def get_customer_orders(self, user_id: int):
+    async def get_customer_orders(self, userid: str):
+        """
+        Получить список заказов пользователя
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         rows = await self.conn.fetch(
             "SELECT * "
             "FROM orders "
-            "WHERE customerid = $1 "
-            "ORDER BY orderid DESC",
-            user_id
+            "WHERE customerid = \'{0}\' "
+            "ORDER BY id DESC".format(userid)
         )
         return [dict(row) for row in rows]
 
-    async def is_user_exists(self, user_id: int):
+    async def is_customer_exists(self, user_id: int):
+        """
+        Проверка существует ли заказчик
+        @param user_id:
+        @return:
+        """
         result = await self.conn.fetchval(
             "SELECT EXISTS("
             "SELECT 1 "
             "FROM customers "
-            "WHERE UserId=$1)",
-            user_id
+            "WHERE userid=\'{0}\')".format(user_id)
         )
         return result
 
     async def get_customers_list(self, city_name: str = None) -> List[int]:
-        """List all bot users"""
+        """
+        Получить список заказчиков
+        @param city_name: Город заказчиков
+        @return:
+        """
         if city_name is None:
             result = await self.conn.fetch(
                 "select * "
-                "from customers"
+                "from customers ORDER BY name"
             )
         else:
             result = await self.conn.fetch(
                 "select * "
                 "from customers"
-                "where city=\'{0}\'".format(city_name)
+                "where city=\'{0}\' ORDER BY name".format(city_name)
             )
         return result
 
-    async def delete_customer(self, user_id: int):
-        """Remove user from DB"""
+    async def delete_customer(self, userid: str):
+        """
+        Удалить заказчика
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         await self.conn.execute(
             "DELETE FROM customers "
-            "WHERE userid = $1",
-            user_id
+            "WHERE userid = \'{0}\'".format(userid)
         )
 
     # couriers
-    async def add_courier(self, user_id: int, name: str, city: str, number: str, passport_main_id: str,
-                          passport_registration_id: str, driver_license_front_id: str, driver_license_back_id: str):
-        """Add courier to DB"""
+    async def add_courier(self, userid: str, name: str, city: str, number: str, passport_main_id: str,
+                          passport_registration_id: str, driver_license_front_id: str, driver_license_back_id: str,
+                          applied: bool = False):
+        """
+        Добавить курьера
+        @param userid: Уникальный идентификатор Telegram
+        @param name: Фио курьера
+        @param city: Город курьера
+        @param number: Номер курьера
+        @param passport_main_id: Уникальный идентификатор фото главной страницы
+        @param passport_registration_id: Уникальный идентификатор фото регистрации
+        @param driver_license_front_id: Уникальный идентификатор фото водител. удостоверения
+        @param driver_license_back_id: Уникальный идентификатор фото водител. удостоверения обратной стороны
+        @param applied: Подтвердить?
+        @return:
+        """
         courier_data = await self.conn.fetch(
             "INSERT INTO couriers"
-            "(userid, name, city, number, passportmain, passportregistration, driverlicensefront, driverlicenseback) "
-            "VALUES ({0}, \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\', \'{7}\') "
+            "(userid, city, name, number, passportmain, passportregistration, driverlicensefront, driverlicenseback, applied) "
+            "VALUES (\'{0}\', \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\', \'{7}\', {8}) "
             "RETURNING id, name, city, number, passportmain, passportregistration, driverlicensefront, "
-            "driverlicenseback".format(
-                user_id,
-                name,
+            "driverlicenseback, status".format(
+                userid,
                 city,
+                name,
                 number,
                 passport_main_id,
                 passport_registration_id,
                 driver_license_front_id,
-                driver_license_back_id)
+                driver_license_back_id,
+                applied)
         )
         return courier_data
 
-    async def get_courier(self, courier_id: int = None, id: int = None):
-        """Get full user data from DB"""
+    async def is_courier_exists(self, userid):
+        """
+        Существует ли курьер
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
+        result = await self.conn.fetchval("""
+    SELECT EXISTS(
+    SELECT 1
+    FROM managers
+    WHERE userid=\'{0}\')
+    """.format(userid))
+        return result
+
+    async def get_courier(self, userid: str = None, id: int = None):
+        """
+        Получить данные курьера
+        @param userid: Уникальный идентификатор Telegram
+        @param id: Инкрементный id курьера
+        @return:
+        """
         if id is None:
             result = await self.conn.fetchrow(
                 "SELECT * "
                 "FROM couriers "
-                "WHERE userid = {0}".format(courier_id)
+                "WHERE userid = \'{0}\'".format(userid)
             )
         else:
             result = await self.conn.fetchrow(
                 "SELECT * "
                 "FROM couriers "
-                "WHERE id = {0}".format(id)
+                "WHERE id = \'{0}\'".format(id)
             )
         return result
 
-    async def get_couriers_orders(self, courier_id: int):
-        """Get all orders completed by courier"""
+    async def get_couriers_orders(self, userid: str):
+        """
+        Получить заказы курьера
+        @param userid: Уникальный идентификатор Telegram курьера
+        @return:
+        """
         rows = await self.conn.fetch(
             "SELECT * "
             "FROM orders "
-            "WHERE courierid = {0}".format(courier_id)
+            "WHERE courierid = \'{0}\' ORDER BY id DESC".format(userid)
         )
         return [dict(row) for row in rows]
 
-    async def get_couriers_list(self) -> list[any]:
-        """Get couriers list"""
-        rows = await self.conn.fetch(
-            "SELECT userid FROM couriers"
-        )
-        return [dict(row) for row in rows]
+    async def get_couriers_list(self, city: str = None):
+        """
+        Получить список курьеров
+        @param city: Город курьеров
+        @return:
+        """
+        if city is None:
+            result = await self.conn.fetch("""
+    SELECT * FROM couriers ORDER BY name""")
+        else:
+            result = await self.conn.fetch("""
+    SELECT * FROM couriers WHERE city=\'{0}\' ORDER BY name""".format(city))
+        return result
 
     async def get_available_couriers_list(self, city: str) -> list[any]:
-        """Get available couriers from DB"""
+        """
+        Получить список доступных курьеров
+        @param city: Город курьеров
+        @return:
+        """
         rows = await self.conn.fetch(
-            "SELECT * from couriers WHERE applied = True and city = \'{0}\'".format(city)
+            "SELECT * from couriers WHERE applied = True and city = \'{0}\' ORDER BY name".format(city)
         )
         return [dict(row) for row in rows]
 
-    async def set_courier_apply_status(self, courier_id: int, applied: bool):
+    async def set_courier_apply_status(self, userid: str, applied: bool):
+        """
+        Установить статус активации курьера
+        @param userid: Уникальный идентификатор Telegram
+        @param applied: Устанавливаемый статус
+        @return:
+        """
         await self.conn.execute(
-            "UPDATE couriers SET applied = {0} WHERE userid = {1}".format(applied, courier_id)
+            "UPDATE couriers SET applied = {0} WHERE userid = \'{1}\'".format(applied, userid)
         )
 
-    async def set_courier_status(self, courier_id: int, status: str):
-        """Change courier status"""
+    async def set_courier_status(self, userid: str, status: str):
+        """
+        Установить статус курьера
+        @param userid: Уникальный идентификатор Telegram
+        @param status: Устанавливаемый статус
+        @return:
+        """
         await self.conn.execute(
-            "UPDATE couriers SET status = \'{0}\' WHERE userid = {1}".format(status, courier_id)
+            "UPDATE couriers SET status = \'{0}\' WHERE userid = \'{1}\'".format(status, userid)
         )
 
-    async def delete_courier(self, courier_id: int):
-        """Delete courier from DB"""
+    async def delete_courier(self, userid: str):
+        """
+        Удалить курьера
+        @param userid: Уникальный идентификатор Telegram
+        @return:
+        """
         await self.conn.execute(
-            "DELETE FROM couriers WHERE userid = {0}".format(courier_id)
+            "DELETE FROM couriers WHERE userid = \'{0}\'".format(userid)
         )
 
     # orders
     async def add_order(self,
                         city: str,
-                        customer_id: int,
+                        customer_userid: str,
                         customer_type: str,
                         customer_name: str,
                         customer_address: str,
@@ -281,47 +501,98 @@ SELECT * FROM managers WHERE city=\'{0}\'""".format(city))
                         order_number: str,
                         order_time: str,
                         other_details: str):
-        """Store order in db"""
+        """
+        Добавить заказ
+        @param city: Город заказа
+        @param customer_userid: Уникальный идентификатор Telegram заказчика
+        @param customer_type: Тип заказчика (Компания/Частное лицо
+        @param customer_name: Фио заказчика
+        @param customer_address: Адрес заказчика
+        @param customer_number: Номер заказчика
+        @param order_name: Фио получателя
+        @param order_address: Адрес получателя
+        @param order_number: Номер получателя
+        @param order_time: Дата и время доставки
+        @param other_details: Другие детали заказа
+        @return:
+        """
         order_id = await self.conn.fetchval(
             "INSERT INTO orders "
             "(city, customerid, customertype, customername, customeraddress, customernumber, ordername, orderaddress, "
             "ordernumber, ordertime, otherdetails) "
-            "VALUES (\'{0}\', {1}, \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\', \'{7}\', \'{8}\', \'{9}\', \'{10}\') "
+            "VALUES (\'{0}\', \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\', \'{6}\', \'{7}\', \'{8}\', \'{9}\', "
+            "\'{10}\') "
             "RETURNING "
-            "orderid".format(city, customer_id, customer_type, customer_name, customer_address, customer_number,
-                             order_name, order_address, order_number, order_time, other_details)
+            "id".format(city, customer_userid, customer_type, customer_name, customer_address, customer_number,
+                        order_name, order_address, order_number, order_time, other_details)
         )
         return order_id
 
-    async def get_order(self, order_id: int):
-        """Get order info by order_id"""
+    async def get_order(self, order_id: str):
+        """
+        Получить данные заказа
+        @param order_id: Уникальный идентификатор Telegram
+        @return:
+        """
         result = await self.conn.fetchrow(
-            "SELECT * FROM orders WHERE orderid = {0}".format(order_id)
+            "SELECT * FROM orders WHERE id = {0}".format(order_id)
         )
         return result
 
-    async def change_order_status(self, order_id: int, order_status: str):
-        """Change order status by order_id"""
+    async def change_order_status(self, order_id: str, order_status: str):
+        """
+        Сменить статус заказа
+        @param order_id: Инкрементный идентификатор заказа
+        @param order_status: Устанавливаемый статус
+        @return:
+        """
         await self.conn.execute(
-            "UPDATE orders SET status = \'{0}\' WHERE orderid = {1}".format(order_status, order_id)
+            "UPDATE orders SET status = \'{0}\' WHERE id = {1}".format(order_status, order_id)
         )
 
-    async def change_order_courier(self, order_id: int, courier_id: int):
+    async def change_order_courier(self, order_id: str, courier_userid: str):
+        """
+        Сменить курьера у заказа
+        @param order_id: Инкрементный идентификатор заказа
+        @param courier_userid: Уникальный идентификатор Telegram курьера
+        @return:
+        """
         await self.conn.execute(
-            "UPDATE orders SET courierid = {0} WHERE orderid = {1}".format(courier_id, order_id)
+            "UPDATE orders SET courierid = {0} WHERE id = {1}".format(courier_userid, order_id)
         )
+
+    async def get_orders_list(self, city: str = None):
+        """
+        Получить список заказов
+        @param city: Город заказов
+        @return:
+        """
+        if city is None:
+            result = await self.conn.fetch("""
+    SELECT * FROM orders by id""")
+        else:
+            result = await self.conn.fetch("""
+    SELECT * FROM orders WHERE city=\'{0}\' ORDER BY id""".format(city))
+        return result
 
     # stats
-    async def get_orders_count(self, date_range: str, courier_id: int = None):
-        """Get orders count by date range"""
-        if courier_id is None:
+    async def get_orders_count(self, city: str, date_range: str, courier_userid: str = None):
+        """
+        Получить кол-во заказов
+        @param city: Город заказов
+        @param date_range: Период
+        @param courier_userid: Уникальный идентификатор Telegram курьера
+        @return:
+        """
+        if courier_userid is None:
             result = await self.conn.fetch(
-                """SELECT *, date_trunc('{0}', orders.currenttime), count(1) FROM orders GROUP BY 1""".format(
-                    date_range)
+                """SELECT *, date_trunc('{0}', orders.registerdate), count(1) FROM orders WHERE city='{1}' GROUP BY 1"""
+                    .format(date_range, city)
             )
         else:
             result = await self.conn.fetch(
-                "7".format(
-                    date_range, courier_id)
+                """SELECT *, date_trunc('{0}', orders.registerdate), count(1) FROM orders WHERE city={1} and 
+                courierid={2} GROUP BY 1""".format(
+                    date_range, city, courier_userid)
             )
         return result

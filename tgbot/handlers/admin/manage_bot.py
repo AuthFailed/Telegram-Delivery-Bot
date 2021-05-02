@@ -5,6 +5,8 @@ from tgbot.services import Repo
 
 
 async def manage_bot(m: Message, repo: Repo):
-    person_data = await repo.get_partner(admin_id=m.chat.id)
+    partner_data = await repo.get_partner(userid=m.chat.id)
     await m.reply(text="Меню управления ботом:",
-                  reply_markup=await manage_bot_kb(is_main=person_data['ismain']))
+                  reply_markup=await manage_bot_kb(is_main=partner_data['main'],
+                                                   is_activated=partner_data['working']))
+

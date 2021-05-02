@@ -16,7 +16,7 @@ async def get_order(m: Message, repo: Repo):
                                                                    courier_id) if courier_id is not None else None if courier_id is not None else None if courier_id is not None else None if courier_id is not None else None if courier_id is not None else None,
                                                                is_new=False)
             await m.reply(text=answer_message,
-                          reply_markup=await order_keyboard(order_id=order_data['orderid']))
+                          reply_markup=await order_keyboard(order_id=order_data['id']))
         except TypeError:
             await m.reply("<b>🔎 Заказа с таким номером не существует.</b>")
     else:

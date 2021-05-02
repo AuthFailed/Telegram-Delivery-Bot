@@ -1,13 +1,13 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from tgbot.keyboards.inline.customer.callback_data import show_item_data, pagination_call, show_partner_data, \
-    show_manager_data
+    show_manager_data, registration_city, show_courier_data
 
 
-async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
-    markup = InlineKeyboardMarkup(row_width=1)
+async def get_pages_keyboard(array, width: int = 1, items_per_page: int = 5, page: int = 1, key: str = "items"):
+    markup = InlineKeyboardMarkup(row_width=width)
 
-    MAX_ITEMS_PER_PAGE = 5
+    MAX_ITEMS_PER_PAGE = items_per_page
     first_item_index = (page - 1) * MAX_ITEMS_PER_PAGE
     last_item_index = page * MAX_ITEMS_PER_PAGE
 
@@ -18,7 +18,7 @@ async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
         for item in sliced_array:
             item_buttons.append(
                 InlineKeyboardButton(
-                    text=f'№{item["id"]} | {item["city"].title()} | {"✅️" if item["isworking"] else "❌"}',
+                    text=f'№{item["id"]} | {item["city"].title()} | {"✅️" if item["working"] else "❌"}',
                     callback_data=show_partner_data.new(partner_id=item['adminid'])
                 ))
     elif key == "managers":
@@ -28,14 +28,27 @@ async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
                     text=f'№{item["id"]} | {item["name"]}',
                     callback_data=show_manager_data.new(manager_id=item['userid'])
                 ))
+    elif key == "couriers":
+        for item in sliced_array:
+            item_buttons.append(
+                InlineKeyboardButton(
+                    text=f'№{item["id"]} {item["name"]} | ⏳ {item["status"]}',
+                    callback_data=show_courier_data.new(courier_id=item['userid'])
+                ))
     elif key == "items":
         for item in sliced_array:
             item_buttons.append(
                 InlineKeyboardButton(
-                    text=f'№{item["orderid"]} | ⏳ {item["status"]}',
-                    callback_data=show_item_data.new(item_id=item['orderid'])
+                    text=f'№{item["id"]} | ⏳ {item["status"]}',
+                    callback_data=show_item_data.new(item_id=item['id'])
                 ))
-
+    elif key == "cities":
+        for item in sliced_array:
+            item_buttons.append(
+                InlineKeyboardButton(
+                    text=f'{item["city"].title()}',
+                    callback_data=registration_city.new(city_name=item["city"])
+                ))
 
     pages_buttons = list()
     first_page = 1
@@ -120,6 +133,13 @@ async def get_pages_keyboard(array, page: int = 1, key: str = "items"):
             InlineKeyboardButton(
                 text="👨‍💼 Добавить менеджера",
                 callback_data=show_manager_data.new(manager_id="add")
+            )
+        )
+    elif key == "couriers":
+        markup.add(
+            InlineKeyboardButton(
+                text="👨‍💼 Добавить курьера",
+                callback_data=show_courier_data.new(courier_id="add")
             )
         )
 

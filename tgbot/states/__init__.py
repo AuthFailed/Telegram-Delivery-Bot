@@ -1,3 +1,3 @@
-from .customer import *
-from .courier import *
 from .admin import *
+from .courier import *
+from .customer import *

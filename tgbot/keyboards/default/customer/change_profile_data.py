@@ -35,7 +35,7 @@ async def change_profile_data(user_type: str):
             keyboard=[
                 [
                     KeyboardButton(
-                        text="👤 ФИО"
+                        text="🧑‍💼 ФИО"
                     )
                 ],
                 [

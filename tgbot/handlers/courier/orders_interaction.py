@@ -8,7 +8,7 @@ from tgbot.services.repository import Repo
 
 
 async def list_of_available_orders(m: Message, repo: Repo):
-    courier_orders = await repo.get_couriers_orders(courier_id=m.chat.id)
+    courier_orders = await repo.get_couriers_orders(userid=m.chat.id)
     if len(courier_orders) > 0:
         await m.answer(text="Ваши заказы:",
                        reply_markup=await get_pages_keyboard(courier_orders))
@@ -17,7 +17,7 @@ async def list_of_available_orders(m: Message, repo: Repo):
 
 
 async def show_chosen_page(c: CallbackQuery, callback_data: dict, repo: Repo):
-    customer_orders = await repo.get_customer_orders(user_id=c.message.chat.id)
+    customer_orders = await repo.get_customer_orders(userid=c.message.chat.id)
     current_page = int(callback_data.get("page"))
 
     try:

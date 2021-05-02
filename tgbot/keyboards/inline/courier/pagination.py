@@ -17,8 +17,8 @@ async def get_pages_keyboard(array, page: int = 1):
     for item in sliced_array:
         item_buttons.append(
             InlineKeyboardButton(
-                text=f'№{item["orderid"]} | ⏳ {item["status"]}',
-                callback_data=show_item_data.new(item_id=item['orderid'])
+                text=f'№{item["id"]} | ⏳ {item["status"]}',
+                callback_data=show_item_data.new(item_id=item['id'])
             ))
 
     pages_buttons = list()

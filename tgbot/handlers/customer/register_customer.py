@@ -27,15 +27,18 @@ def register_customer(dp: Dispatcher):
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(start, text="🏠 Вернуться в меню", state="*",
                                 chat_type=ChatType.PRIVATE)
+    dp.register_message_handler()
 
     # reg user
-    dp.register_message_handler(reg_starts, text="✍️ Зарегистрироваться", role=UserRole.USER,
+    dp.register_message_handler(reg_starts, state=RegistrationUser.type, role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(reg_type, content_types=['text'], state=RegistrationUser.type,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationUser.name,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_callback_query_handler(reg_city, registration_city.filter(), state=RegistrationUser.city)
+    dp.register_callback_query_handler(show_chosen_page, pagination_call.filter(key="cities"), role=UserRole.USER)
+    dp.register_callback_query_handler(set_city, registration_city.filter(), role=UserRole.USER,
+                                       state=RegistrationUser.city)
     dp.register_message_handler(reg_address, content_types=['text'], state=RegistrationUser.address,
                                 chat_type=ChatType.PRIVATE)
     dp.register_message_handler(reg_number, content_types=['text', 'contact'], state=RegistrationUser.number,
@@ -94,4 +97,5 @@ def register_customer(dp: Dispatcher):
     dp.register_message_handler(our_services, text="🚀 Наши услуги", role=UserRole.USER,
                                 chat_type=ChatType.PRIVATE)
 
-    dp.register_message_handler(get_my_id, commands=['id'], role=[UserRole.USER, UserRole.COURIER, UserRole.MANAGER, UserRole.ADMIN])
+    dp.register_message_handler(get_my_id, commands=['id'],
+                                role=[UserRole.USER, UserRole.COURIER, UserRole.MANAGER, UserRole.ADMIN])

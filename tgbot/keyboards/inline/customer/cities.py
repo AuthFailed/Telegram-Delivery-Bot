@@ -3,18 +3,9 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from tgbot.keyboards.inline.customer.callback_data import registration_city
 
 
-async def cities(cities_list):
-    item_buttons = list()
+async def available_cities(cities_list: list):
+    keyboard = InlineKeyboardMarkup()
     for city in cities_list:
-        item_buttons.append(
-            InlineKeyboardButton(
-                text=city['city'].title(),
-                callback_data=registration_city.new(city_name=city['city'])
-            ))
-    markup = InlineKeyboardMarkup()
-    for button in item_buttons:
-        markup.insert(button)
-    return markup
-
-
-
+        keyboard.add(InlineKeyboardButton(text=f"{city['city']}",
+                                          callback_data=registration_city.new(city_name=city['city'])))
+    return keyboard

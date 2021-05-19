@@ -11,7 +11,7 @@ from tgbot.handlers.courier.start import start
 from tgbot.handlers.courier.support_call import ask_support_call, send_to_support_call, answer_support_call, \
     not_supported, exit_support, ask_support_call_callback
 from tgbot.keyboards.inline.courier.callback_data import show_item_data, pagination_call
-from tgbot.keyboards.inline.customer.callback_data import registration_city
+from tgbot.keyboards.inline.courier.callback_data import registration_city
 from tgbot.keyboards.inline.manager.callback_data import support_callback, cancel_support_callback, order
 from tgbot.models.role import UserRole
 from tgbot.states.courier.change_status import ChangeStatus
@@ -29,8 +29,8 @@ def register_courier(dp: Dispatcher):
     # reg courier
     dp.register_message_handler(reg_name, content_types=['text'], state=RegistrationCourier.name,
                                 chat_type=ChatType.PRIVATE)
-    dp.register_callback_query_handler(show_chosen_page_city, pagination_call.filter(key="cities"))
-    dp.register_callback_query_handler(set_city, registration_city.filter(), state="*")
+    dp.register_callback_query_handler(show_chosen_page_city, pagination_call.filter(key="cities"), state=RegistrationCourier.city)
+    dp.register_callback_query_handler(set_city, registration_city.filter(), state=RegistrationCourier.city)
 
     dp.register_message_handler(reg_number, content_types=['text', 'contact'], state=RegistrationCourier.number,
                                 chat_type=ChatType.PRIVATE)

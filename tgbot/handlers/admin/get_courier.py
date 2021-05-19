@@ -7,7 +7,8 @@ async def get_courier(m: Message, repo: Repo):
     args = m.get_args()
     if len(args) > 0:
         try:
-            courier_data = await repo.get_courier(id=int(args))
+             #requestor_data = await repo.get  # @TODO разобраться в виде реквестера
+            courier_data = await repo.get_courier(serial_id=int(args))
             answer_message = f"""<b>🔎 Информация о курьере №{courier_data["id"]}</b>
 
 Статус: {courier_data['status']}

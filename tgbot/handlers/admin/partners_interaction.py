@@ -47,7 +47,7 @@ async def generate_partner_data_message(partner_data, m: Message):
 🎃 События: {events_group}
 
 Активирован: {"❌ Нет" if partner_data['working'] is False else "✅ Да"}
-🆔 Администратор: <a href="tg://user?id={partner_data['adminid']}">Ссылка на профиль</a> """
+🆔 Администратор: <a href="tg://user?id={partner_data['userid']}">Ссылка на профиль</a> """
     return message_to_send
 
 
@@ -181,7 +181,7 @@ async def partner_action(c: CallbackQuery, callback_data: dict, repo: Repo):
         await repo.delete_partner(userid=callback_data['partner_id'])
         await c.answer(text="Партнер удален")
         try:
-            await c.bot.send_message(chat_id=partner_data['adminid'],
+            await c.bot.send_message(chat_id=partner_data['userid'],
                                      text="<b>Ваш город удален, с вам сняты права администратора.</b>\n\n"
                                           "<i>Если у вас есть вопросы, пожалуйста, обратитесь в тех. поддержку.</i>")
             await c.message.edit_text(f"""
@@ -189,7 +189,7 @@ async def partner_action(c: CallbackQuery, callback_data: dict, repo: Repo):
 
 🧑‍💼 <b>Общая информация</b>:
 Город: <code>{partner_data['city'].title()}</code>
-Администратор: <a href="tg://user?id={partner_data['adminid']}">Ссылка на профиль</a>
+Администратор: <a href="tg://user?id={partner_data['userid']}">Ссылка на профиль</a>
 
 Партнер получил уведомление о том, что он был удален.""")
         except exceptions.ChatNotFound:
@@ -198,7 +198,7 @@ async def partner_action(c: CallbackQuery, callback_data: dict, repo: Repo):
 
 🧑‍💼 <b>Общая информация</b>:
 Город: <code>{partner_data['city'].title()}</code>
-Администратор: <a href="tg://user?id={partner_data['adminid']}">Ссылка на профиль</a>
+Администратор: <a href="tg://user?id={partner_data['userid']}">Ссылка на профиль</a>
 
 Партнер не получил уведомление о том, что он был удален (<i>бот не активирован<i>)""")
 

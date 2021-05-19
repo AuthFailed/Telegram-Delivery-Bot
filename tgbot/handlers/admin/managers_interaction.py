@@ -145,7 +145,8 @@ async def manager_action(c: CallbackQuery, callback_data: dict, repo: Repo):
         try:
             await c.bot.send_message(chat_id=manager_data['userid'],
                                      text="<b>С вас сняты права менеджера.</b>\n\n"
-                                          "<i>Если у вас есть вопросы, пожалуйста, обратитесь в отделение своего города.</i>")
+                                          "<i>Если у вас есть вопросы, пожалуйста,"
+                                          " обратитесь в отделение своего города.</i>")
             await c.message.edit_text(f"""
 <b>Менеджер №{manager_data['id']} удален </b>
 

@@ -57,7 +57,7 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
     order_status = callback_data.get("status")
     couriers_list = [courier['userid'] for courier in await repo.get_couriers_list()]
     if order_status == "Вернуться":
-        order_data = await repo.get_order(order_id=str(order_id))
+        order_data = await repo.get_order(order_id=order_id)
         courier_id = order_data['courierid']
         if call.message.chat.id not in couriers_list:
             await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,
@@ -73,8 +73,9 @@ async def change_order_status_db(call: CallbackQuery, callback_data: dict, repo:
                                          reply_markup=await courier_order_keyboard_kb(order_id=order_id))
 
     else:
-        await repo.change_order_status(order_id=str(order_id), order_status=order_status)
-        order_data = await repo.get_order(order_id=str(order_id))
+        await repo.change_order_status(order_id=order_id, order_status=order_status)
+        order_data = await repo.get_order(order_id=order_id)
+        print(order_data['city'])
         courier_id = order_data['courierid']
         if call.message.chat.id not in couriers_list:
             await call.message.edit_text(text=await generate_order_data_message(order_data=order_data,

@@ -2,7 +2,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class RegistrationUser(StatesGroup):
-    referral = State()
+    # referral = State()
     type = State()
     name = State()
     city = State()

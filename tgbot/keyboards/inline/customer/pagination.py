@@ -19,7 +19,7 @@ async def get_pages_keyboard(array, width: int = 1, items_per_page: int = 5, pag
             item_buttons.append(
                 InlineKeyboardButton(
                     text=f'№{item["id"]} | {item["city"].title()} | {"✅️" if item["working"] else "❌"}',
-                    callback_data=show_partner_data.new(partner_id=item['adminid'])
+                    callback_data=show_partner_data.new(partner_id=item['userid'])
                 ))
     elif key == "managers":
         for item in sliced_array:

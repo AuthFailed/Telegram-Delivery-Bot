@@ -18,9 +18,11 @@ from tgbot.handlers.admin.partners_interaction import list_of_available_partners
 from tgbot.handlers.admin.servers_stats import servers_stats
 from tgbot.handlers.admin.setting_groups import setting_groups
 from tgbot.handlers.admin.start import start
+from tgbot.handlers.admin.statistics import statistics
 from tgbot.keyboards.inline.admin.callback_data import partner, manager, courier
 from tgbot.keyboards.inline.customer.callback_data import pagination_call, show_partner_data, show_manager_data, \
     show_courier_data
+from tgbot.models.role import UserRole
 from tgbot.states.admin.new_courier import NewCourier
 from tgbot.states.admin.new_manager import NewManager
 from tgbot.states.admin.new_partner import NewPartner
@@ -29,6 +31,8 @@ from tgbot.states.admin.new_partner import NewPartner
 def register_admin(dp: Dispatcher):
     dp.register_message_handler(start, commands=["start", "menu"], is_admin=True, chat_type=ChatType.PRIVATE)
     dp.register_message_handler(start, text="🏠 Вернуться в меню", state="*", is_admin=True, chat_type=ChatType.PRIVATE)
+
+    dp.register_message_handler(statistics, text="📈 Статистика", is_admin=True, chat_type=ChatType.PRIVATE)
 
     # Управление партнерами
     dp.register_message_handler(list_of_available_partners, text="🤝 Партнеры", is_admin=True,
@@ -89,6 +93,6 @@ def register_admin(dp: Dispatcher):
     dp.register_message_handler(servers_stats, text="⚙️ Статус сервера", is_admin=True, chat_type=ChatType.PRIVATE)
     dp.register_message_handler(setting_groups, commands=["setting_groups"], is_admin=True, chat_type=ChatType.PRIVATE)
 
-    dp.register_message_handler(get_courier, commands=["курьер"], is_admin=True, chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(get_order, commands=["заказ"], is_admin=True, chat_type=ChatType.PRIVATE)
-    dp.register_message_handler(get_customer, commands=["заказчик"], is_admin=True, chat_type=ChatType.PRIVATE)
+    dp.register_message_handler(get_courier, commands=["курьер"], role=[UserRole.ADMIN, UserRole.MANAGER], chat_type=[ChatType.PRIVATE, ChatType.SUPERGROUP])
+    dp.register_message_handler(get_order, commands=["заказ"], role=[UserRole.ADMIN, UserRole.MANAGER], chat_type=[ChatType.PRIVATE, ChatType.SUPERGROUP])
+    dp.register_message_handler(get_customer, commands=["заказчик"], role=[UserRole.ADMIN, UserRole.MANAGER], chat_type=[ChatType.PRIVATE, ChatType.SUPERGROUP])

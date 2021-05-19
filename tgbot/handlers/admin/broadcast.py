@@ -67,7 +67,8 @@ broadcast = Dialog(
 
 
 async def broadcast_start(m: Message, repo: Repo, dialog_manager: DialogManager):
-    await dialog_manager.start(Broadcast.broadcast_type, reset_stack=True)
+    await m.answer(text="👨‍💻 Этот раздел находится в разработке!")
+    # await dialog_manager.start(Broadcast.broadcast_type, reset_stack=True)
 
 
 async def broadcast_image(m: Message, state: FSMContext):

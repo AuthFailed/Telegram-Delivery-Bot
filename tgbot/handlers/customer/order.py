@@ -1,5 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
+from aiogram.utils.exceptions import ChatNotFound
 
 from tgbot.handlers.manager.order_interaction import generate_order_data_message
 from tgbot.keyboards.default.customer.check_order import check_order
@@ -23,9 +24,16 @@ async def order_starts(m: Message, repo: Repo):
             return
         customer_data = await repo.get_customer(userid=m.chat.id)
         if customer_data['usertype'] == "Частное лицо":
-            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:" \
+                             "\nФИО" \
+                             "\nНомер телефона" \
+                             "\nАдрес получателя"
         else:
-            answer_message = "Введите данные <b>получателя</b> в следующем формате:\nФИО\nНомер телефона\nАдрес получателя\nДату и время доставки"
+            answer_message = "Введите данные <b>получателя</b> в следующем формате:" \
+                             "\nФИО" \
+                             "\nНомер телефона" \
+                             "\nАдрес получателя" \
+                             "\nДату и время доставки"
         await m.reply(text=answer_message,
                       reply_markup=return_to_menu)
         await Order.first()
@@ -159,15 +167,18 @@ async def order_user_choice(m: Message, repo: Repo, state=FSMContext):
         city_info = await repo.get_partner(city=customer_data['city'])
         if city_info['ordersgroupid'] is None:
             await m.answer("Произошла ошибка, мы уже оповестили администратора.")
-            await m.bot.send_message(chat_id=city_info['adminid'], text=f"")
+            await m.bot.send_message(chat_id=city_info['userid'], text=f"")
             await state.finish()
             await m.answer(text="Главное меню",
                            reply_markup=await main_menu(reg=True))
             return
-        await m.bot.send_message(chat_id=city_info['ordersgroupid'],
-                                 text=await generate_order_data_message(order_data=order_data,
-                                                                        is_new=True),
-                                 reply_markup=await order_keyboard(order_id=order_id))
+        try:
+            await m.bot.send_message(chat_id=city_info['ordersgroupid'],
+                                     text=await generate_order_data_message(order_data=order_data,
+                                                                            is_new=True),
+                                     reply_markup=await order_keyboard(order_id=order_id))
+        except ChatNotFound:
+            print(f"Чат {city_info['ordersgroupid']} не найден. Скорее всего бот не добавлен в эту группу.")
 
         await m.answer(
             text=f"🚩 Заказ №{order_id} отправлен!\n"

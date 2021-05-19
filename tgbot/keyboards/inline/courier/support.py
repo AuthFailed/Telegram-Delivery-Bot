@@ -42,6 +42,8 @@ async def support_keyboard(messages, repo: Repo, city: str, state: FSMContext, u
         # и нужно подобрать для него оператора
 
         manager_data = await get_support_manager(state=state, repo=repo, city=city)
+        if manager_data is None:
+            return False
         contact_id = manager_data['userid']
         as_user = "yes"
         if messages == "many" and contact_id is None:

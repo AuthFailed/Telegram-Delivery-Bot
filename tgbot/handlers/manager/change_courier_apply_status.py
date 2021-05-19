@@ -3,10 +3,10 @@ from aiogram.types import CallbackQuery
 from tgbot.services.repository import Repo
 
 
-async def change_courier_apply_status(call: CallbackQuery, data_callback: dict, repo: Repo):
-    print("da")
+async def change_courier_apply_status(call: CallbackQuery, callback_data: dict, repo: Repo):
     await call.answer(
-        text=f"Вы {'приняли' if callback_data.get('status') == 'True' else 'отклонили'} заявку №{callback_data.get('courier_id')}")
+        text=f"Вы {'приняли' if callback_data.get('status') == 'True' else 'отклонили'}"
+             f" заявку №{callback_data.get('courier_id')}")
     courier_id = callback_data.get("courier_id")
 
     status = True if callback_data.get("status") == 'True' else False

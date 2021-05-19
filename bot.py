@@ -73,14 +73,14 @@ async def main():
     register_customer(dp)
     register_group(dp)
 
-    # register apscheduler
-    scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
-    scheduler.start()
-    # scheduler.add_job(send_stats, 'interval', args=(bot, True, repository.Repo(pool)), seconds=2)
-    scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), hour=23, minute=0,
-                      replace_existing=True)  # Day stats
-    scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), day_of_week='Sun', hour=23, minute=0,
-                      replace_existing=True)  # week stats
+    # register apscheduler @TODO запустить статистику
+    # scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+    # scheduler.start()
+
+    # scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), hour=23, minute=0,
+    #                   replace_existing=True)  # Day stats
+    # scheduler.add_job(send_stats, 'cron', args=(bot, True, repository.Repo(pool)), day_of_week='Sun', hour=23, minute=0,
+    #                   replace_existing=True)  # week stats
 
     # start
     try:

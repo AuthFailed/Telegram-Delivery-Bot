@@ -29,7 +29,7 @@ async def send_photo(bot: Bot, repo: Repo, user_id: int, photo, caption: str,
     except exceptions.RetryAfter as e:
         logger.error(f"Пользователь [ID:{user_id}]: Достигнут лимит рассылки. Засыпаю на {e.timeout} секунд.")
         await asyncio.sleep(e.timeout)
-        return await send_photo(user_id, photo, caption)  # Recursive call
+        return await send_photo(user_id=user_id, photo=photo, caption=caption)  # Recursive call
     except exceptions.UserDeactivated:
         logger.error(f"Пользователь [ID:{user_id}]: Аккаунт деактивирован/удалён")
     except exceptions.TelegramAPIError:

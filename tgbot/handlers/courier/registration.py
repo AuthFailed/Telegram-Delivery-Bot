@@ -50,7 +50,11 @@ async def set_city(c: CallbackQuery, callback_data: dict, state: FSMContext):
 
 
 async def reg_number(m: Message, state: FSMContext):
-    await state.update_data(number=m.text)
+    if m.contact is not None:
+        phone_number = m.contact.phone_number
+    else:
+        phone_number = m.text
+    await state.update_data(number=phone_number)
 
     await m.reply(text="💼 Отправьте <b>главную страницу паспорта</b>:",
                   reply_markup=return_to_menu)
@@ -115,10 +119,12 @@ async def reg_driving_license_back(m: Message, repo: Repo, state: FSMContext):
 <i>На рассмотрении</i>"""
 
     city_data = await repo.get_partner(city=courier_data['city'])
-    courier_data_message = await m.bot.send_message(chat_id=city_data['couriersgroupid'],
-                                                    text=courier_message,
-                                                    reply_markup=await courier_request_kb(courier_id=m.chat.id))
+
     if city_data['couriersgroupid'] is not None:
+        courier_data_message = await m.bot.send_message(chat_id=city_data['couriersgroupid'],
+                                                        text=courier_message,
+                                                        reply_markup=await courier_request_kb(courier_id=m.chat.id))
         await new_courier(m=m, courier_data=courier_db_data[0])
-    await courier_data_message.answer_media_group(media=media,
-                                                  reply=True)
+        await courier_data_message.answer_media_group(media=media,
+                                                      reply=True)
+

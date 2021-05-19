@@ -1,13 +1,9 @@
 [tg_bot]
 token =
-use_redis = true
-orders_group =
-couriers_group =
-events_group =
-city_name =
+use_redis =
 
 [db]
 user = postgres
 password = postgres
-database = postgres
+database = delivery
 host = 127.0.0.1
